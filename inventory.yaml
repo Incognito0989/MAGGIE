@@ -1,0 +1,11 @@
+decode:
+  - ip_range: [10.4.11.68, 10.4.11.68]
+    json_file: "Services/Decode_Service_TEST.service.json"
+
+Transcode:
+  - ip_range: [10.4.11.68, 10.4.11.68]
+    json_file: "Templates/POST_Transcode_Service.template.json"
+
+Descramble:
+  - ip_range: [10.4.11.68, 10.4.11.68]
+    json_file: "Templates/POST_Descrambling_Routing.template.json"
