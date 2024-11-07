@@ -1,13 +1,42 @@
+import datetime
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
-import main
-import ipaddress
+import api_tool
+import ipaddress, sys
+
+class RedirectedOutput:
+    def __init__(self, text_widget):
+        self.text_widget = text_widget
+
+    def write(self, message):
+        # Add a timestamp before each message
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Format timestamp as you wish
+        message_with_timestamp = f"[{timestamp}] {message}"
+
+        # Temporarily enable the text widget to insert text
+        self.text_widget.config(state=tk.NORMAL)
+        self.text_widget.insert(tk.END, message_with_timestamp)
+        self.text_widget.see(tk.END)  # Auto-scroll to the latest output
+        self.text_widget.config(state=tk.DISABLED)  # Disable it again to prevent editing
+
+    def flush(self):  # To handle interactive environments
+        pass
+
+def process_service_for_ip(service_type, ip, service_dir):
+    # Create a mapping of service types to their corresponding functions
+    service_functions = {
+        "decode": api_tool.post_decode_service,
+        "transcode": api_tool.post_transcode_service,
+        "descramble": api_tool.post_descramble_service
+    }
+    
+    # Check if the service type is valid and call the corresponding function
+    if service_type in service_functions:
+        service_functions[service_type](ip, service_dir)
 
 # Function to generate the IP range using ipaddress
 def ip_range(start_ip, end_ip):
-    print(start_ip)
-    print(end_ip)
     # Create IP address objects
     start = ipaddress.ip_address(start_ip)
     end = ipaddress.ip_address(end_ip)
@@ -104,6 +133,14 @@ def create_tool_tab(notebook, services_dir):
 
     # Run config based on selected IP range or inventory file
     def begin_config():
+        # Validate that both the service type and config file are selected
+        if not selected_service_type.get():
+            print("Please select a service type.")
+            return
+        if not selected_file.get():
+            print("Please select a config file.")
+            return
+    
         if mode_notebook.index("current") == 0:  # Config mode
             start_ip = ip_range_start.get()
             end_ip = ip_range_end.get() if ip_range_end.get() else ip_range_start.get()
@@ -114,10 +151,11 @@ def create_tool_tab(notebook, services_dir):
             if not start_ip:
                 messagebox.showwarning("Input Error", "Please enter an IP range start.")
                 return
-            messagebox.showinfo("Starting Config", f"Starting config for {service_dir} from IP {start_ip} to {end_ip}.")
+            print(f"Starting config for {service_dir} from IP {start_ip} to {end_ip}.")
             for ip in ip_range(ip_range_start.get(), ip_range_end.get()):
-                main.post_auth(ip)
-                main.post_decode_service(ip, service_dir)
+                api_tool.post_auth(ip)
+                process_service_for_ip(service_type, ip, service_dir)  # Process based on service type
+
 
         elif mode_notebook.index("current") == 1:  # Inventory mode
             if not inventory_file_loaded.get().startswith("Loaded file"):
@@ -128,5 +166,13 @@ def create_tool_tab(notebook, services_dir):
     # Button to start the configuration process
     begin_button = tk.Button(tool_tab, text="Begin Config", command=begin_config, bg="green", fg="black")
     begin_button.pack(side=tk.BOTTOM, pady=10, padx=10, anchor="e")
+
+    # Console output display
+    console_output = tk.Text(tool_tab, height=10, wrap="word", state="disabled")
+    console_output.pack(fill="x", padx=10, pady=5)
+
+    # Redirect stdout and sderr to the Text widget
+    sys.stdout = RedirectedOutput(console_output)
+    sys.stderr = RedirectedOutput(console_output)
 
     return tool_tab
