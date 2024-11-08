@@ -2,9 +2,10 @@ import datetime
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
-import api_tool
 import ipaddress, sys
-
+from utils.api_utils import *
+from components.ip_range_selector import IPRangeSelector
+from utils.ip_utils import *
 class RedirectedOutput:
     def __init__(self, text_widget):
         self.text_widget = text_widget
@@ -23,28 +24,6 @@ class RedirectedOutput:
     def flush(self):  # To handle interactive environments
         pass
 
-def process_service_for_ip(service_type, ip, service_dir):
-    # Create a mapping of service types to their corresponding functions
-    service_functions = {
-        "decode": api_tool.post_decode_service,
-        "transcode": api_tool.post_transcode_service,
-        "descramble": api_tool.post_descramble_service
-    }
-    
-    # Check if the service type is valid and call the corresponding function
-    if service_type in service_functions:
-        service_functions[service_type](ip, service_dir)
-
-# Function to generate the IP range using ipaddress
-def ip_range(start_ip, end_ip):
-    # Create IP address objects
-    start = ipaddress.ip_address(start_ip)
-    end = ipaddress.ip_address(end_ip)
-
-    # Iterate through the range of IP addresses
-    for ip in range(int(start), int(end) + 1):
-        yield ipaddress.ip_address(ip)
-
 def create_tool_tab(notebook, services_dir):
     # Create Tool tab
     tool_tab = ttk.Frame(notebook)
@@ -57,9 +36,10 @@ def create_tool_tab(notebook, services_dir):
     # Variables for Config tab inputs
     selected_file = tk.StringVar()
     selected_service_type = tk.StringVar()  # New variable for service type selection
-    ip_range_start = tk.StringVar()
-    ip_range_end = tk.StringVar()
     inventory_file_loaded = tk.StringVar(value="No file loaded")
+
+    send_to_all_connected = tk.BooleanVar()  # Variable for the checkbox
+
 
     # --- Config Tab ---
     config_frame = ttk.Frame(mode_notebook)
@@ -101,17 +81,17 @@ def create_tool_tab(notebook, services_dir):
     # Load files when service type changes
     service_type_menu.bind("<<ComboboxSelected>>", lambda e: load_config_files())
 
-    # IP Range input fields
-    ip_frame = tk.Frame(config_frame)
-    ip_frame.pack(pady=10, padx=10, anchor="w")
+    # # IP Range input fields
+    # ip_frame = tk.Frame(config_frame)
+    # ip_frame.pack(pady=10, padx=10, anchor="w")
 
-    ttk.Label(ip_frame, text="IP Range Start:").grid(row=0, column=0, padx=5, pady=5)
-    ip_start_entry = ttk.Entry(ip_frame, textvariable=ip_range_start, width=20)
-    ip_start_entry.grid(row=0, column=1, padx=5, pady=5)
+    # ttk.Label(ip_frame, text="IP Range Start:").grid(row=0, column=0, padx=5, pady=5)
+    # ip_start_entry = ttk.Entry(ip_frame, textvariable=ip_range_start, width=20)
+    # ip_start_entry.grid(row=0, column=1, padx=5, pady=5)
 
-    ttk.Label(ip_frame, text="IP Range End:").grid(row=1, column=0, padx=5, pady=5)
-    ip_end_entry = ttk.Entry(ip_frame, textvariable=ip_range_end, width=20)
-    ip_end_entry.grid(row=1, column=1, padx=5, pady=5)
+    # ttk.Label(ip_frame, text="IP Range End:").grid(row=1, column=0, padx=5, pady=5)
+    # ip_end_entry = ttk.Entry(ip_frame, textvariable=ip_range_end, width=20)
+    # ip_end_entry.grid(row=1, column=1, padx=5, pady=5)
 
     # --- Inventory Tab ---
     inventory_frame = ttk.Frame(mode_notebook)
@@ -131,6 +111,8 @@ def create_tool_tab(notebook, services_dir):
     inventory_label = ttk.Label(inventory_frame, textvariable=inventory_file_loaded, foreground="green")
     inventory_label.pack(pady=5, padx=10)
 
+    ip_range_selector = IPRangeSelector(config_frame)
+
     # Run config based on selected IP range or inventory file
     def begin_config():
         # Validate that both the service type and config file are selected
@@ -142,8 +124,9 @@ def create_tool_tab(notebook, services_dir):
             return
     
         if mode_notebook.index("current") == 0:  # Config mode
-            start_ip = ip_range_start.get()
-            end_ip = ip_range_end.get() if ip_range_end.get() else ip_range_start.get()
+            start_ip = ip_range_selector.get_ip_start()
+            end_ip = ip_range_selector.get_ip_end() if ip_range_selector.get_ip_end else ip_range_selector.get_ip_start()
+
             # Define path based on selected service type
             service_type = selected_service_type.get()
             service_dir = Path("./payloads/" + service_type + "/" + selected_file.get())
@@ -152,9 +135,12 @@ def create_tool_tab(notebook, services_dir):
                 messagebox.showwarning("Input Error", "Please enter an IP range start.")
                 return
             print(f"Starting config for {service_dir} from IP {start_ip} to {end_ip}.")
-            for ip in ip_range(ip_range_start.get(), ip_range_end.get()):
-                api_tool.post_auth(ip)
-                process_service_for_ip(service_type, ip, service_dir)  # Process based on service type
+            for ip in ip_range(start_ip, end_ip):
+                if is_ip_reachable(ip):
+                    print(f"IP {ip} is reachable. Proceeding with configuration.")
+                    post_auth(ip)
+                    process_service_for_ip(selected_service_type.get(), ip, service_dir)
+                else: continue
 
 
         elif mode_notebook.index("current") == 1:  # Inventory mode
