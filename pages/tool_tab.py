@@ -31,7 +31,7 @@ def create_tool_tab(notebook, services_dir):
 
     # Mode selection (Config or Inventory)
     mode_notebook = ttk.Notebook(tool_tab)
-    mode_notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+    mode_notebook.pack(fill=tk.BOTH, expand=False, padx=10, pady=10)
 
     # Variables for Config tab inputs
     selected_file = tk.StringVar()
@@ -151,10 +151,10 @@ def create_tool_tab(notebook, services_dir):
 
     # Button to start the configuration process
     begin_button = tk.Button(tool_tab, text="Begin Config", command=begin_config, bg="green", fg="black")
-    begin_button.pack(side=tk.BOTTOM, pady=10, padx=10, anchor="e")
+    begin_button.pack(side=tk.BOTTOM, expand=True, pady=10, padx=10, anchor="e")
 
     # Console output display
-    console_output = tk.Text(tool_tab, height=10, wrap="word", state="disabled")
+    console_output = tk.Text(tool_tab, height=40, wrap="word", state="disabled")
     console_output.pack(fill="x", padx=10, pady=5)
 
     # Redirect stdout and sderr to the Text widget
