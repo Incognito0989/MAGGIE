@@ -6,6 +6,7 @@ import ipaddress, sys
 from utils.api_utils import *
 from components.ip_range_selector import IPRangeSelector
 from utils.ip_utils import *
+
 class RedirectedOutput:
     def __init__(self, text_widget):
         self.text_widget = text_widget

@@ -10,9 +10,15 @@ from utils.logo import ResizableImageApp
 # Initialize the main window
 root = tk.Tk()
 root.title("Meg Service Tool")
-root.geometry("1000x800")
 
-ResizableImageApp(root, "assets/synamedia-logo-black-rgb.png")
+# Get the screen width and height
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+
+# Set the window size to fill the entire screen
+root.geometry(f"{screen_width}x{screen_height}")
+
+# ResizableImageApp(root, "assets/synamedia-logo-black-rgb.png")  # If you need to add an image
 
 # Define the services directory path
 services_dir = Path(__file__).parent / "payloads"
@@ -21,7 +27,6 @@ services_dir = Path(__file__).parent / "payloads"
 notebook = ttk.Notebook(root)
 notebook.pack(fill="both", expand=True)
 
-
 # Add each tab by calling the create functions
 create_tool_tab(notebook, services_dir)
 create_config_editor_tab(notebook, services_dir)
@@ -29,3 +34,4 @@ create_inventory_tab(notebook)
 
 # Run the Tkinter event loop
 root.mainloop()
+
