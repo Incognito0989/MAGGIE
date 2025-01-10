@@ -1,0 +1,155 @@
+{
+    "name": "potato",
+    "descrambling": null,
+    "inputService": {
+        "source": {
+            "id": "0001fffc-0000-0001-0000-00000000000e",
+            "url": "http://localhost:8133/api/v2/Sources/0001fffc-0000-0001-0000-00000000000e",
+            "sw_ref": "1-65532-1--",
+            "inputType": "DVB-T",
+            "dvbtSettings": {
+                "interface": "RF1",
+                "frequency": 411111111,
+                "channelBandwidth": 6,
+                "targetUdp": 25001,
+                "tsStandard": "Default",
+                "TSID": 4294967295,
+                "ONID": 4294967295,
+                "tsLossTriggers": {
+                    "triggerMode": "Default",
+                    "triggers": [
+                        {
+                            "trigger": "ServiceLoss"
+                        },
+                        {
+                            "trigger": "InputLoss"
+                        }
+                    ]
+                },
+                "tsBackup": {
+                    "tsBackupMode": "NonRevertive",
+                    "delayMainToBackup": 0,
+                    "delayBackupToMain": 10,
+                    "backupActivationMode": "Always",
+                    "activeBackupTS": 0,
+                    "backupTSs": []
+                },
+                "channelId": "potato",
+                "bandwidthLimit": {
+                    "mode": "Default",
+                    "bitrate": 0
+                }
+            }
+        },
+        "inputType": "DVB-T",
+        "dvbtSettings": {
+            "serviceId": 88,
+            "serviceSystemName": "",
+            "serviceUserName": "potato"
+        }
+    },
+    "processing": {
+        "processingType": "Decode",
+        "serviceSettings": {
+            "userName": "potato",
+            "serviceLossTriggers": {
+                "triggers": [
+                    "VideoInputLoss",
+                    "AudioInputLoss",
+                    "FormatMismatch",
+                    "ProcessingError"
+                ]
+            }
+        },
+        "videoSettings": {
+            "processingMode": "Decode",
+            "decodeSource": {
+                "tracktype": "StreamType",
+                "sourcePid": null,
+                "streamType": "MPEG2",
+                "componentTag": null,
+                "freezeFrameDetection": "Disabled",
+                "freezeFrameThreshold": null,
+                "topLineBlanking": 0,
+                "horizontalSharpness": 12,
+                "verticalSharpness": 18,
+                "IT_Detection": "Disabled",
+                "croppingSettings": {
+                    "mode": "Disabled",
+                    "topOffset": null,
+                    "bottomOffset": null,
+                    "leftOffset": null,
+                    "rightOffset": null
+                },
+                "videoInputLoss": "BlackFrames"
+            },
+            "decodes": [
+                {
+                    "decodeName": "VideoProfile#1",
+                    "format": "HD",
+                    "resolutionMode": "FollowInput",
+                    "hResolution": "640",
+                    "vResolution": "720",
+                    "frameRate": "50",
+                    "afdArOutputMode": null,
+                    "afdArOutputAr": null,
+                    "afdArSourceMode": null,
+                    "arSourceSelection": null,
+                    "afdSourceSelection": null,
+                    "detailEnhancement": "Disabled"
+                }
+            ]
+        },
+        "audioSettings": []
+    },
+    "outputs": [
+        {
+            "interface": "SDI4",
+            "outputType": "SDI",
+            "userName": null,
+            "streaming": null,
+            "channelId": null,
+            "nmosUUID": null,
+            "sdiSettings": {
+                "sdiComponents": [
+                    {
+                        "type": "Video",
+                        "userName": "Video",
+                        "videoSettings": {
+                            "videoDecodeName": "VideoProfile#1",
+                            "closedCaptions": {
+                                "format": "CEA-708",
+                                "field1LineOffset": 5
+                            },
+                            "afd": {
+                                "enable": true,
+                                "field1LineOffset": 4
+                            },
+                            "scte104": [
+                                {
+                                    "enable": false,
+                                    "scte35Pid": null,
+                                    "field1LineOffset": 6
+                                }
+                            ],
+                            "sourceVbiPids": [],
+                            "st-2031": {
+                                "enable": true,
+                                "field1LineOffset": 7
+                            },
+                            "sdp_op47": {
+                                "enable": true,
+                                "field1LineOffset": 8
+                            },
+                            "mdp_op47": {
+                                "enable": true,
+                                "field1LineOffset": 9
+                            },
+                            "vitc": {
+                                "mode": "Passthrough"
+                            },
+                            "wss": {
+                                "mode": "Passthrough"
+                            },
+                            "analogVbiSettings": {
+                                "teletext": null,

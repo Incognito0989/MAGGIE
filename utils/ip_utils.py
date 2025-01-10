@@ -1,13 +1,13 @@
 import ipaddress
 import subprocess
 import platform
-from . import api_utils
+from utils.api_utils import *
 
 def process_service_for_ip(service_type, ip, service_dir):
     service_functions = {
-        "decode": api_utils.post_decode_service,
-        "transcode": api_utils.post_transcode_service,
-        "descramble": api_utils.post_descramble_service
+        "decode": post_decode_service,
+        "transcode": post_transcode_service,
+        "descramble": post_descramble_service
     }
     
     if service_type in service_functions:

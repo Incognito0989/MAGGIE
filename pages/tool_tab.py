@@ -1,11 +1,15 @@
 import datetime
+from time import sleep
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
 import ipaddress, sys
+from components.status_panel import StatusPanel
 from utils.api_utils import *
 from components.ip_range_selector import IPRangeSelector
 from utils.ip_utils import *
+from utils.switch_utils import *
+from settings import *
 
 class RedirectedOutput:
     def __init__(self, text_widget):
@@ -21,9 +25,52 @@ class RedirectedOutput:
         self.text_widget.insert(tk.END, message_with_timestamp)
         self.text_widget.see(tk.END)  # Auto-scroll to the latest output
         self.text_widget.config(state=tk.DISABLED)  # Disable it again to prevent editing
-
+        
     def flush(self):  # To handle interactive environments
         pass
+
+def send_payload_all(request_type, payload):
+    print()
+    print("Send payload to all initiating")
+
+    # turn off all ports except management
+    print("Turning off all ports")
+    update_all_ports(switch_ip, 2)
+    print(get_all_port_status(switch_ip))
+
+    # send payload for each port
+    ports = get_port_list(switch_ip)
+    ports = [10, 11, 12, 13, 14, 15, 16, 17, 18]
+    for port in ports:
+        print()
+        print(f"Turning port {port} on")
+        set_port(switch_ip, port, 1)      # Turn port on
+
+        sleep(6)                  # wait for meg to be reachable
+        
+        # if not is_port_operational(switch_ip, port):
+        #     print("Port not operational")
+        #     continue
+        # else:
+        #     print("PORT OPERATIONAL")
+
+        if is_ip_reachable(base_meg_ip):
+            print("Meg is reachable. Continuing with payload")
+        else:
+            print("Meg is not reachable. Skipping this port")
+            continue
+
+        # Get auth for this meg
+        print("Getting authorization to meg")
+        post_auth(base_meg_ip)
+
+        # make post request to meg
+        process_service_for_ip(request_type, base_meg_ip, payload)
+        
+        # Turn port off
+        set_port(switch_ip, port, 2)      
+    update_all_ports(switch_ip, 1)
+    # print(get_all_port_status(switch_ip))
 
 def create_tool_tab(notebook, services_dir):
     # Create Tool tab
@@ -82,18 +129,6 @@ def create_tool_tab(notebook, services_dir):
     # Load files when service type changes
     service_type_menu.bind("<<ComboboxSelected>>", lambda e: load_config_files())
 
-    # # IP Range input fields
-    # ip_frame = tk.Frame(config_frame)
-    # ip_frame.pack(pady=10, padx=10, anchor="w")
-
-    # ttk.Label(ip_frame, text="IP Range Start:").grid(row=0, column=0, padx=5, pady=5)
-    # ip_start_entry = ttk.Entry(ip_frame, textvariable=ip_range_start, width=20)
-    # ip_start_entry.grid(row=0, column=1, padx=5, pady=5)
-
-    # ttk.Label(ip_frame, text="IP Range End:").grid(row=1, column=0, padx=5, pady=5)
-    # ip_end_entry = ttk.Entry(ip_frame, textvariable=ip_range_end, width=20)
-    # ip_end_entry.grid(row=1, column=1, padx=5, pady=5)
-
     # --- Inventory Tab ---
     inventory_frame = ttk.Frame(mode_notebook)
     mode_notebook.add(inventory_frame, text="By Inventory")
@@ -112,7 +147,7 @@ def create_tool_tab(notebook, services_dir):
     inventory_label = ttk.Label(inventory_frame, textvariable=inventory_file_loaded, foreground="green")
     inventory_label.pack(pady=5, padx=10)
 
-    ip_range_selector = IPRangeSelector(config_frame)
+    # ip_range_selector = IPRangeSelector(config_frame)
 
     # Run config based on selected IP range or inventory file
     def begin_config():
@@ -125,23 +160,12 @@ def create_tool_tab(notebook, services_dir):
             return
     
         if mode_notebook.index("current") == 0:  # Config mode
-            start_ip = ip_range_selector.get_ip_start()
-            end_ip = ip_range_selector.get_ip_end() if ip_range_selector.get_ip_end else ip_range_selector.get_ip_start()
 
             # Define path based on selected service type
             service_type = selected_service_type.get()
             service_dir = Path("./payloads/" + service_type + "/" + selected_file.get())
 
-            if not start_ip:
-                messagebox.showwarning("Input Error", "Please enter an IP range start.")
-                return
-            print(f"Starting config for {service_dir} from IP {start_ip} to {end_ip}.")
-            for ip in ip_range(start_ip, end_ip):
-                if is_ip_reachable(ip):
-                    print(f"IP {ip} is reachable. Proceeding with configuration.")
-                    post_auth(ip)
-                    process_service_for_ip(selected_service_type.get(), ip, service_dir)
-                else: continue
+            send_payload_all(service_type, service_dir)
 
 
         elif mode_notebook.index("current") == 1:  # Inventory mode
@@ -153,6 +177,15 @@ def create_tool_tab(notebook, services_dir):
     # Button to start the configuration process
     begin_button = tk.Button(tool_tab, text="Begin Config", command=begin_config, bg="green", fg="black")
     begin_button.pack(side=tk.BOTTOM, expand=True, pady=10, padx=10, anchor="e")
+
+    # Create and pack the Status Panel on the right side
+    # status_panel = StatusPanel(config_frame, port_count=20)
+    # status_panel.pack(side="right", fill="y", padx=10, pady=10)
+
+    # # Example update: Set some ports to show different statuses
+    # status_panel.update_port_status(1, "off")
+    # status_panel.update_port_status(2, "failed")
+    # status_panel.update_port_status(3, "complete")
 
     # Console output display
     console_output = tk.Text(tool_tab, height=40, wrap="word", state="disabled")
