@@ -116,6 +116,51 @@ def get_all_port_status(switch_ip, community='public'):
     return result
 
 
+def get_active_ports(switch_ip, port_list=None, community='public'):
+    """
+    Returns a list of ports that have an operational status of 'up'.
+
+    Args:
+        switch_ip (str): IP address of the switch
+        port_list (list): List of port numbers (as integers)
+        community (str): SNMP community string (default: public)
+
+    Returns:
+        list: List of ports with operational status 'up'
+    """
+    #get port list if not provided
+    if(port_list is None):
+        port_list = get_port_list(switch_ip)
+
+    active_ports = []
+    oper_status_oid_prefix = "1.3.6.1.2.1.2.2.1.8"  # OID prefix for ifOperStatus
+
+    for port in port_list:
+        oid = f"{oper_status_oid_prefix}.{port}"
+        error_indication, error_status, error_index, var_binds = next(
+            getCmd(
+                SnmpEngine(),
+                CommunityData(community),
+                UdpTransportTarget((switch_ip, 161)),
+                ContextData(),
+                ObjectType(ObjectIdentity(oid))
+            )
+        )
+
+        if error_indication:
+            print(f"Error for port {port}: {error_indication}")
+        elif error_status:
+            print(f"Error for port {port}: {error_status.prettyPrint()}")
+        else:
+            for var_bind in var_binds:
+                # ifOperStatus: 1 (up), 2 (down), etc.
+                status = int(var_bind[1])
+                if status == 1:  # Operationally 'up'
+                    active_ports.append(port)
+
+    return active_ports
+
+
 
 
 def get_all_physical_ports(switch_ip, community='public'):

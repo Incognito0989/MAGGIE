@@ -33,26 +33,22 @@ def send_payload_all(request_type, payload):
     print()
     print("Send payload to all initiating")
 
+    #Get all operational ports to configure
+    update_all_ports(switch_ip, 1)
+    ports = get_active_ports(switch_ip)
+
     # turn off all ports except management
     print("Turning off all ports")
     update_all_ports(switch_ip, 2)
     print(get_all_port_status(switch_ip))
 
     # send payload for each port
-    ports = get_port_list(switch_ip)
-    ports = [10, 11, 12, 13, 14, 15, 16, 17, 18]
     for port in ports:
         print()
         print(f"Turning port {port} on")
         set_port(switch_ip, port, 1)      # Turn port on
 
         sleep(6)                  # wait for meg to be reachable
-        
-        # if not is_port_operational(switch_ip, port):
-        #     print("Port not operational")
-        #     continue
-        # else:
-        #     print("PORT OPERATIONAL")
 
         if is_ip_reachable(base_meg_ip):
             print("Meg is reachable. Continuing with payload")
