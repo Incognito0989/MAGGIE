@@ -31,20 +31,25 @@ class RedirectedOutput:
 
 def send_payload_all(request_type, payload):
     print()
-    print("Send payload to all initiating")
+    print("INITIATING PAYLOAD PROCESS")
 
     #Get all operational ports to configure
     update_all_ports(switch_ip, 1)
     ports = get_active_ports(switch_ip)
+    print("ACTIVE PORTS: ")
+    print(ports)
 
     # turn off all ports except management
     print("Turning off all ports")
     update_all_ports(switch_ip, 2)
-    print(get_all_port_status(switch_ip))
+    # print(get_all_port_status(switch_ip))
 
     # send payload for each port
     for port in ports:
         print()
+
+        # (port - 1) because the first port is number 2. this is done for readability
+        print(f"===================MEG CONFIG ON PORT {(int(port) - 1)}========================")
         print(f"Turning port {port} on")
         set_port(switch_ip, port, 1)      # Turn port on
 

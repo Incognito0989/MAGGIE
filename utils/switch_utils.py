@@ -340,8 +340,8 @@ def set_port(switch_ip, port_index, status=1, community='private'):
         print(f"Error turning off port {port_index}: {errorIndication}")
     elif errorStatus:
         print(f"Error on port {port_index}: {errorStatus.prettyPrint()}")
-    else:
-        print(f"Successfully set port {port_index} status to {status}")
+    # else:
+    #     print(f"Successfully set port {port_index} status to {status}")
 
 def update_all_ports(switch_ip, status=1, community='private'):
     """
@@ -355,12 +355,24 @@ def update_all_ports(switch_ip, status=1, community='private'):
     """
     # Get the list of all ports
     ports = get_port_list(switch_ip)
+    failed_ports = []
 
     for port in ports:
         if str(port) == str(management_port):
             print("Skipping moddification to management port: " + port)
             continue
-        set_port(switch_ip, port, status, community)
+        try:
+            set_port(switch_ip, port, status, community)  # Attempt to set port
+        except Exception as e:
+            failed_ports += port
+            print(f"Failed to modify port {port}: {e}")
+        
+    # Final message after the loop
+    if failed_ports:
+        print("The following ports failed to be modified:", failed_ports)
+    else:
+        print("All ports were successfully modified.")
+
 
 
 
