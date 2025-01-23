@@ -1,9 +1,11 @@
 import datetime
+import threading
 from time import sleep
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
 import ipaddress, sys
+from components.file_dropper import FileDropper
 from components.status_panel import StatusPanel
 from utils.api_utils import *
 from components.ip_range_selector import IPRangeSelector
@@ -71,7 +73,9 @@ def send_payload_all(request_type, payload):
         # Turn port off
         set_port(switch_ip, port, 2)      
     update_all_ports(switch_ip, 1)
-    # print(get_all_port_status(switch_ip))
+    print()
+    print("==============================================")
+    print("PAYLOAD PROCESS COMPLETE")
 
 def create_tool_tab(notebook, services_dir):
     # Create Tool tab
@@ -86,8 +90,6 @@ def create_tool_tab(notebook, services_dir):
     selected_file = tk.StringVar()
     selected_service_type = tk.StringVar()  # New variable for service type selection
     inventory_file_loaded = tk.StringVar(value="No file loaded")
-
-    send_to_all_connected = tk.BooleanVar()  # Variable for the checkbox
 
 
     # --- Config Tab ---
@@ -130,50 +132,58 @@ def create_tool_tab(notebook, services_dir):
     # Load files when service type changes
     service_type_menu.bind("<<ComboboxSelected>>", lambda e: load_config_files())
 
-    # --- Inventory Tab ---
-    inventory_frame = ttk.Frame(mode_notebook)
-    mode_notebook.add(inventory_frame, text="By Inventory")
+    #file dropper
+    dropper = FileDropper(config_frame)
+    dropper.pack(side="right", padx=50)
 
-    # Inventory file upload button and label to show the loaded file
-    def upload_inventory_file():
-        file_path = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")])
-        if file_path:
-            inventory_file_loaded.set(f"Loaded file: {Path(file_path).name}")
-            # Optionally, copy or move the file to a specific location for processing
+    # # --- Inventory Tab ---
+    # # inventory_frame = ttk.Frame(mode_notebook)
+    # # mode_notebook.add(inventory_frame, text="By Inventory")
 
-    upload_button = tk.Button(inventory_frame, text="Upload Inventory File", command=upload_inventory_file, bg="blue", fg="black")
-    upload_button.pack(pady=10, padx=10)
+    # # Inventory file upload button and label to show the loaded file
+    # def upload_inventory_file():
+    #     file_path = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")])
+    #     if file_path:
+    #         inventory_file_loaded.set(f"Loaded file: {Path(file_path).name}")
+    #         # Optionally, copy or move the file to a specific location for processing
 
-    # Display loaded inventory file name
-    inventory_label = ttk.Label(inventory_frame, textvariable=inventory_file_loaded, foreground="green")
-    inventory_label.pack(pady=5, padx=10)
+    # upload_button = tk.Button(inventory_frame, text="Upload Inventory File", command=upload_inventory_file, bg="blue", fg="black")
+    # upload_button.pack(pady=10, padx=10)
+
+    # # Display loaded inventory file name
+    # inventory_label = ttk.Label(inventory_frame, textvariable=inventory_file_loaded, foreground="green")
+    # inventory_label.pack(pady=5, padx=10)
 
     # ip_range_selector = IPRangeSelector(config_frame)
 
     # Run config based on selected IP range or inventory file
     def begin_config():
-        # Validate that both the service type and config file are selected
-        if not selected_service_type.get():
-            print("Please select a service type.")
-            return
-        if not selected_file.get():
-            print("Please select a config file.")
-            return
-    
-        if mode_notebook.index("current") == 0:  # Config mode
-
-            # Define path based on selected service type
-            service_type = selected_service_type.get()
-            service_dir = Path("./payloads/" + service_type + "/" + selected_file.get())
-
-            send_payload_all(service_type, service_dir)
-
-
-        elif mode_notebook.index("current") == 1:  # Inventory mode
-            if not inventory_file_loaded.get().startswith("Loaded file"):
-                messagebox.showwarning("Input Error", "Please upload an inventory file.")
+        def background():
+            # Validate that both the service type and config file are selected
+            if not selected_service_type.get():
+                print("Please select a service type.")
                 return
-            messagebox.showinfo("Starting Config", f"Configuring based on {inventory_file_loaded.get()}.")
+            if not selected_file.get():
+                print("Please select a config file.")
+                return
+        
+            if mode_notebook.index("current") == 0:  # Config mode
+
+                # Define path based on selected service type
+                service_type = selected_service_type.get()
+                service_dir = Path("./payloads/" + service_type + "/" + selected_file.get())
+
+                send_payload_all(service_type, service_dir)
+
+
+            elif mode_notebook.index("current") == 1:  # Inventory mode
+                if not inventory_file_loaded.get().startswith("Loaded file"):
+                    messagebox.showwarning("Input Error", "Please upload an inventory file.")
+                    return
+                messagebox.showinfo("Starting Config", f"Configuring based on {inventory_file_loaded.get()}.")
+
+        # Run the process in a separate thread
+        threading.Thread(target=background, daemon=True).start()
 
     # Button to start the configuration process
     begin_button = tk.Button(tool_tab, text="Begin Config", command=begin_config, bg="green", fg="black")

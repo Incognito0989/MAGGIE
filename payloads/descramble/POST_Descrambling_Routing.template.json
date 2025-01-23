@@ -1,0 +1,2393 @@
+{
+  "descrambling": {
+    "descramblingType": "CAM",
+    "name": "<string>",
+    "CAM": {
+      "cam": "<string>"
+    }
+  },
+  "inputService": {
+    "source": {
+      "inputType": "ZIXI",
+      "xgressSettings": {
+        "interface": "<string>",
+        "targetUdp": "<integer>",
+        "vlanId": 0,
+        "sourceIp": "0.0.0.0",
+        "targetIp": "0.0.0.0",
+        "sourceIps": [
+          "<ipv4>"
+        ],
+        "tsStandard": "Default",
+        "sptsRoutingMode": "Default",
+        "timeBaseSelection": {
+          "mode": "Default",
+          "sid": "<integer>",
+          "fastLockMode": false
+        },
+        "tsFEC": {
+          "triggerMode": "Disabled",
+          "columnFEC": {
+            "targetIp": "0.0.0.0",
+            "targetUdp": "<integer>"
+          },
+          "rowFEC": {
+            "targetIp": "0.0.0.0",
+            "targetUdp": "<integer>"
+          }
+        },
+        "tsLossTriggers": {
+          "triggerMode": "Disabled",
+          "triggers": [
+            {
+              "trigger": "PAT_Error"
+            }
+          ]
+        },
+        "packetCounterThresholds": {
+          "mode": "Default",
+          "fixedPackets": 0,
+          "missingPacketsBeforeErrorCorrection": 0,
+          "missingPacketsAfterErrorCorrection": 0,
+          "packetsOutOfRange": 0
+        },
+        "hitlessMerge": {
+          "mode": "Default",
+          "backupSocket": {
+            "targetIp": "<string>"
+          }
+        },
+        "tsBackup": {
+          "tsBackupMode": "Revertive",
+          "delayMainToBackup": 0,
+          "delayBackupToMain": 10,
+          "backupActivationMode": "Always",
+          "activeBackupTS": "<integer>",
+          "backupTSs": [
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            }
+          ]
+        },
+        "channelId": "",
+        "bandwidthLimit": {
+          "mode": "Default",
+          "bitrate": "<integer>"
+        },
+        "RTP_BufferMode": "Default",
+        "reorderWindowReadoutLevel": 16,
+        "reorderWindowReadoutDelay": 10,
+        "udpStreamLossTimeOutMode": "FollowDefault",
+        "udpStreamLossTimeOut": 2500
+      },
+      "abr2tsSettings": {
+        "protocol": "ABR",
+        "ABR_Url": "<string>",
+        "backupUrl": "",
+        "secondaryMainUrl": "",
+        "secondaryBackupUrl": "",
+        "tsOverHttpLatency": 2000,
+        "streamKey": "<uuid>",
+        "updateStreamKey": false,
+        "targetUdp": 65535,
+        "tsStandard": "Default",
+        "tsLossTriggers": {
+          "triggerMode": "Specific",
+          "triggers": [
+            {
+              "trigger": "UdpStreamLoss"
+            }
+          ]
+        },
+        "decryption": {
+          "mode": "Disabled",
+          "staticKey": "<string>",
+          "initializationVector": "<string>"
+        },
+        "latency": 300,
+        "deterministicLatency": false,
+        "forceServiceId": false,
+        "serviceId": "<integer>",
+        "receiveMode": "On",
+        "timeShiftDelay": 0,
+        "tsBackup": {
+          "tsBackupMode": "NonRevertive",
+          "delayMainToBackup": 0,
+          "delayBackupToMain": 10,
+          "backupActivationMode": "Always",
+          "activeBackupTS": "<integer>",
+          "backupTSs": [
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            }
+          ]
+        },
+        "channelId": "",
+        "bandwidthLimit": {
+          "mode": "Default",
+          "bitrate": "<integer>"
+        },
+        "udpStreamLossTimeOutMode": "FollowDefault",
+        "udpStreamLossTimeOut": 2500
+      },
+      "zixiSettings": {
+        "source": {
+          "streamName": "<string>",
+          "sourceIP": "0.0.0.0",
+          "sourceUdp": 1024,
+          "altSourceIPs": [
+            "<string>"
+          ],
+          "requestUdp": 0,
+          "interface": "Any"
+        },
+        "targetUdp": 65535,
+        "tsStandard": "Default",
+        "streamType": "Pull",
+        "latency": 3000,
+        "timeBaseSelection": {
+          "mode": "Default",
+          "sid": "<integer>",
+          "fastLockMode": false
+        },
+        "security": {
+          "userName": "",
+          "passphrase": "",
+          "decrypt": "Disabled",
+          "decryptKey": ""
+        },
+        "tsLossTriggers": {
+          "triggerMode": "Specific",
+          "triggers": [
+            {
+              "trigger": "ServiceLoss"
+            }
+          ]
+        },
+        "channelId": "",
+        "tsBackup": {
+          "tsBackupMode": "Mixed",
+          "delayMainToBackup": 0,
+          "delayBackupToMain": 10,
+          "backupActivationMode": "Always",
+          "activeBackupTS": "<integer>",
+          "backupTSs": [
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            }
+          ]
+        },
+        "bandwidthLimit": {
+          "mode": "Default",
+          "bitrate": "<integer>"
+        },
+        "RTP_BufferMode": "Default",
+        "reorderWindowReadoutLevel": 16,
+        "reorderWindowReadoutDelay": 10,
+        "udpStreamLossTimeOutMode": "FollowDefault",
+        "udpStreamLossTimeOut": 2500
+      },
+      "sdiSettings": {
+        "interface": "<string>",
+        "userName": "<string>",
+        "channelId": "",
+        "VBI": {
+          "SD_VBI": [
+            {
+              "type": "WSS",
+              "field": "Field2",
+              "line": "<integer>",
+              "alarmTrigger": "Disabled",
+              "alarmDebounceBegin": 500,
+              "alarmDebounceEnd": 500
+            }
+          ],
+          "HD_VBI": {
+            "alarmTrigger": "Disabled",
+            "alarmDebounceBegin": 500,
+            "alarmDebounceEnd": 500
+          }
+        },
+        "sdiLossTriggers": {
+          "triggers": [
+            "SDI_InputLoss",
+            "InvalidVideoFormat"
+          ]
+        },
+        "smpte2038": [
+          {
+            "DID": "<integer>",
+            "SDID": "<integer>"
+          },
+          {
+            "DID": "<integer>",
+            "SDID": "<integer>"
+          },
+          {
+            "DID": "<integer>",
+            "SDID": "<integer>"
+          }
+        ],
+        "highDynamicRange": {
+          "mode": "Manual",
+          "format": "SDR",
+          "displayPrimaries": "Auto",
+          "displayMasteringLuminanceEnabled": false,
+          "displayMasteringLuminance": {
+            "min": 1,
+            "max": 10000000
+          },
+          "contentLightLevelInfoEnabled": false,
+          "contentLightLevelInfo": {
+            "maxFall": 150,
+            "maxCLL": 1000
+          }
+        }
+      },
+      "st20226Settings": {
+        "interface": "<string>",
+        "userName": "<string>",
+        "targetUdp": "<integer>",
+        "targetIp": "0.0.0.0",
+        "sourceIps": [
+          "<ipv4>"
+        ],
+        "allowedVideoSignal": "Blocked",
+        "playoutDelay": 10,
+        "hitlessMergeEnabled": false,
+        "backupSocket": {
+          "targetUdp": "<integer>",
+          "targetIp": "0.0.0.0",
+          "sourceIp": "0.0.0.0"
+        },
+        "streamBackup": {
+          "switchOverDelay": 0,
+          "joinDelay": 15,
+          "activeBackupStream": 0,
+          "backupStreams": [
+            {
+              "mainSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              },
+              "hitlessMergeEnabled": false,
+              "backupSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              }
+            },
+            {
+              "mainSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              },
+              "hitlessMergeEnabled": false,
+              "backupSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              }
+            },
+            {
+              "mainSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              },
+              "hitlessMergeEnabled": false,
+              "backupSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              }
+            },
+            {
+              "mainSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              },
+              "hitlessMergeEnabled": false,
+              "backupSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              }
+            },
+            {
+              "mainSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              },
+              "hitlessMergeEnabled": false,
+              "backupSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              }
+            },
+            {
+              "mainSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              },
+              "hitlessMergeEnabled": false,
+              "backupSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              }
+            },
+            {
+              "mainSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              },
+              "hitlessMergeEnabled": false,
+              "backupSocket": {
+                "targetIp": "<ipv4>",
+                "targetUdp": "<integer>",
+                "sourceIp": "<ipv4>"
+              }
+            }
+          ]
+        },
+        "packetCounterThresholds": {
+          "missingPacketsBeforeErrorCorrection": 0,
+          "missingPacketsAfterErrorCorrection": 0,
+          "packetsOutOfRange": 0
+        },
+        "channelId": "",
+        "VBI": {
+          "SD_VBI": [
+            {
+              "type": "WSS",
+              "field": "Field1",
+              "line": "<integer>",
+              "alarmTrigger": "Disabled",
+              "alarmDebounceBegin": 500,
+              "alarmDebounceEnd": 500
+            }
+          ],
+          "HD_VBI": {
+            "alarmTrigger": "Disabled",
+            "alarmDebounceBegin": 500,
+            "alarmDebounceEnd": 500
+          }
+        },
+        "sdiLossTriggers": {
+          "triggers": [
+            "SDI_InputLoss",
+            "InvalidVideoFormat"
+          ]
+        },
+        "smpte2038": [
+          {
+            "DID": "<integer>",
+            "SDID": "<integer>"
+          },
+          {
+            "DID": "<integer>",
+            "SDID": "<integer>"
+          },
+          {
+            "DID": "<integer>",
+            "SDID": "<integer>"
+          }
+        ],
+        "highDynamicRange": {
+          "mode": "Manual",
+          "format": "SDR",
+          "displayPrimaries": "Auto",
+          "displayMasteringLuminanceEnabled": false,
+          "displayMasteringLuminance": {
+            "min": 1,
+            "max": 10000000
+          },
+          "contentLightLevelInfoEnabled": false,
+          "contentLightLevelInfo": {
+            "maxFall": 150,
+            "maxCLL": 1000
+          }
+        }
+      },
+      "tsfileSettings": {
+        "source": {
+          "fileName": "<string>",
+          "streaming": "<boolean>",
+          "udpSize": 7,
+          "updateCC": true,
+          "makeLoopContinuous": true
+        },
+        "targetUdp": 65535,
+        "tsStandard": "Default",
+        "timeBaseSelection": {
+          "mode": "Default",
+          "sid": "<integer>",
+          "fastLockMode": false
+        },
+        "tsLossTriggers": {
+          "triggerMode": "Default",
+          "triggers": [
+            {
+              "trigger": "UdpStreamLoss"
+            }
+          ]
+        },
+        "channelId": "",
+        "bandwidthLimit": {
+          "mode": "Default",
+          "bitrate": "<integer>"
+        },
+        "RTP_BufferMode": "Default",
+        "reorderWindowReadoutLevel": 16,
+        "reorderWindowReadoutDelay": 10,
+        "udpStreamLossTimeOutMode": "FollowDefault",
+        "udpStreamLossTimeOut": 2500
+      },
+      "srtSettings": {
+        "source": {
+          "sourceIP": "<string>",
+          "sourceUdp": 0,
+          "receptionPort": 0,
+          "interface": "Any",
+          "vlanId": 0
+        },
+        "targetUdp": 65535,
+        "mode": "Listener",
+        "tsStandard": "Default",
+        "sptsRoutingMode": "Default",
+        "latency": 200,
+        "overruleBufferSize": false,
+        "bufferSize": "<integer>",
+        "streamId": "",
+        "receiveMode": "On",
+        "lostPacketsThreshold": 0,
+        "droppedPacketsThreshold": 0,
+        "timeBaseSelection": {
+          "mode": "Default",
+          "sid": "<integer>",
+          "fastLockMode": false
+        },
+        "security": {
+          "passphrase": "",
+          "keyLength": "Disabled"
+        },
+        "tsLossTriggers": {
+          "triggerMode": "Disabled",
+          "triggers": [
+            {
+              "trigger": "ServiceLoss"
+            }
+          ]
+        },
+        "tsfec": {
+          "mode": "Disabled",
+          "autoRepeat": "OnRequest"
+        },
+        "hitlessMerge": "Disabled",
+        "backupStream": {
+          "source": {
+            "sourceIP": "<string>",
+            "sourceUdp": 0,
+            "receptionPort": 0,
+            "interface": "Any",
+            "vlanId": 0
+          },
+          "mode": "Listener",
+          "security": {
+            "passphrase": "",
+            "keyLength": "Disabled"
+          },
+          "tsfec": {
+            "mode": "Disabled",
+            "autoRepeat": "OnRequest"
+          },
+          "streamId": "",
+          "receiveMode": "On"
+        },
+        "channelId": "",
+        "tsBackup": {
+          "tsBackupMode": "Mixed",
+          "delayMainToBackup": 0,
+          "delayBackupToMain": 10,
+          "backupActivationMode": "Always",
+          "activeBackupTS": "<integer>",
+          "backupTSs": [
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            }
+          ]
+        },
+        "bandwidthLimit": {
+          "mode": "Default",
+          "bitrate": "<integer>"
+        },
+        "RTP_BufferMode": "Default",
+        "reorderWindowReadoutLevel": 16,
+        "reorderWindowReadoutDelay": 10,
+        "udpStreamLossTimeOutMode": "FollowDefault",
+        "udpStreamLossTimeOut": 2500
+      },
+      "st2110Settings": {
+        "interface": "<string>",
+        "userName": "<string>",
+        "streamUUID": "00000000-0000-0000-0000-000000000000",
+        "essences": [
+          {
+            "targetUdp": "<integer>",
+            "type": "Video",
+            "language": "<string>",
+            "userName": "",
+            "receiverUUID": "00000000-0000-0000-0000-000000000000",
+            "senderUUID": "00000000-0000-0000-0000-000000000000",
+            "masterEnabled": true,
+            "mainEnabled": true,
+            "sdp": "<string>",
+            "targetIp": "0.0.0.0",
+            "sourceIps": [
+              "<ipv4>"
+            ],
+            "hitlessMergeEnabled": false,
+            "backupSocket": {
+              "targetUdp": "<integer>",
+              "targetIp": "0.0.0.0",
+              "sourceIp": "0.0.0.0"
+            },
+            "playoutDelay": 10,
+            "packetCounterThresholds": {
+              "missingPacketsBeforeErrorCorrection": 0,
+              "missingPacketsAfterErrorCorrection": 0,
+              "packetsOutOfRange": 0
+            },
+            "channelId": ""
+          }
+        ],
+        "VBI": {
+          "HD_VBI": {
+            "alarmTrigger": "Disabled",
+            "alarmDebounceBegin": 500,
+            "alarmDebounceEnd": 500
+          }
+        },
+        "allowedVideoSignal": "UpToHD",
+        "serviceDelay": 10,
+        "channelId": "",
+        "playoutDelay": 10,
+        "sdiLossTriggers": {
+          "triggers": [
+            "SDI_InputLoss",
+            "InvalidVideoFormat"
+          ]
+        },
+        "smpte2038": [
+          {
+            "DID": "<integer>",
+            "SDID": "<integer>"
+          },
+          {
+            "DID": "<integer>",
+            "SDID": "<integer>"
+          },
+          {
+            "DID": "<integer>",
+            "SDID": "<integer>"
+          }
+        ],
+        "highDynamicRange": {
+          "mode": "Manual",
+          "format": "SDR",
+          "displayPrimaries": "Auto",
+          "displayMasteringLuminanceEnabled": false,
+          "displayMasteringLuminance": {
+            "min": 1,
+            "max": 10000000
+          },
+          "contentLightLevelInfoEnabled": false,
+          "contentLightLevelInfo": {
+            "maxFall": 150,
+            "maxCLL": 1000
+          }
+        }
+      },
+      "asiSettings": {
+        "interface": "<string>",
+        "tsStandard": "Default",
+        "tsLossTriggers": {
+          "triggerMode": "Default",
+          "triggers": [
+            {
+              "trigger": "ServiceLoss"
+            }
+          ]
+        },
+        "channelId": "",
+        "tsBackup": {
+          "tsBackupMode": "Revertive",
+          "delayMainToBackup": 0,
+          "delayBackupToMain": 10,
+          "backupActivationMode": "Always",
+          "activeBackupTS": "<integer>",
+          "backupTSs": [
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            }
+          ]
+        },
+        "bandwidthLimit": {
+          "mode": "Default",
+          "bitrate": "<integer>"
+        }
+      },
+      "isdbtSettings": {
+        "interface": "<string>",
+        "frequency": "<integer>",
+        "channelBandwidth": 6,
+        "subChannel": 22,
+        "segments": 13,
+        "targetUdp": 65535,
+        "tsStandard": "Default",
+        "tsLossTriggers": {
+          "triggerMode": "Default",
+          "triggers": [
+            {
+              "trigger": "InputLoss"
+            }
+          ]
+        },
+        "tsBackup": {
+          "tsBackupMode": "Mixed",
+          "delayMainToBackup": 0,
+          "delayBackupToMain": 10,
+          "backupActivationMode": "Always",
+          "activeBackupTS": "<integer>",
+          "backupTSs": [
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            }
+          ]
+        },
+        "channelId": "",
+        "bandwidthLimit": {
+          "mode": "Default",
+          "bitrate": "<integer>"
+        }
+      },
+      "atsc1Settings": {
+        "interface": "<string>",
+        "frequency": "<integer>",
+        "targetUdp": 65535,
+        "tsStandard": "Default",
+        "tsLossTriggers": {
+          "triggerMode": "Disabled",
+          "triggers": [
+            {
+              "trigger": "ServiceLoss"
+            }
+          ]
+        },
+        "tsBackup": {
+          "tsBackupMode": "Revertive",
+          "delayMainToBackup": 0,
+          "delayBackupToMain": 10,
+          "backupActivationMode": "Always",
+          "activeBackupTS": "<integer>",
+          "backupTSs": [
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            }
+          ]
+        },
+        "channelId": "",
+        "bandwidthLimit": {
+          "mode": "Default",
+          "bitrate": "<integer>"
+        }
+      },
+      "atsc3Settings": {
+        "interface": "<string>",
+        "targetUdp": 65535,
+        "receiverId": "00000000-0000-0000-0000-000000000000",
+        "receiverName": "<string>",
+        "atscServiceId": "<long>",
+        "tsStandard": "Default",
+        "tsLossTriggers": {
+          "triggerMode": "Specific",
+          "triggers": [
+            {
+              "trigger": "InputLoss"
+            }
+          ]
+        },
+        "tsBackup": {
+          "tsBackupMode": "Mixed",
+          "delayMainToBackup": 0,
+          "delayBackupToMain": 10,
+          "backupActivationMode": "Always",
+          "activeBackupTS": "<integer>",
+          "backupTSs": [
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            }
+          ]
+        },
+        "channelId": "",
+        "bandwidthLimit": {
+          "mode": "Default",
+          "bitrate": "<integer>"
+        }
+      },
+      "ristSettings": {
+        "source": {
+          "sourceIP": "<string>",
+          "sourceUdp": 0,
+          "receptionPort": 0,
+          "interface": "Any"
+        },
+        "targetUdp": 65535,
+        "mode": "Listener",
+        "tsStandard": "Default",
+        "profile": "Simple",
+        "bufferSize": 1000,
+        "reorderBuffer": 100,
+        "maximumBandwidth": 100000,
+        "returnBandwidth": 100,
+        "minimumRoundTripTime": 50,
+        "maximumRoundTripTime": 500,
+        "authentication": {
+          "username": "<string>",
+          "passphrase": "<string>"
+        },
+        "security": {
+          "decryptionMode": "Disabled",
+          "passphrase": "<string>"
+        },
+        "receiveMode": "On",
+        "timeBaseSelection": {
+          "mode": "Default",
+          "sid": "<integer>",
+          "fastLockMode": false
+        },
+        "tsLossTriggers": {
+          "triggerMode": "Disabled",
+          "triggers": [
+            {
+              "trigger": "PAT_Error"
+            }
+          ]
+        },
+        "hitlessMerge": "Disabled",
+        "backupStream": {
+          "source": {
+            "sourceIP": "<string>",
+            "sourceUdp": 0,
+            "receptionPort": 0,
+            "interface": "Any"
+          },
+          "mode": "Listener",
+          "profile": "Simple",
+          "reorderBuffer": 100,
+          "maximumBandwidth": 100000,
+          "returnBandwidth": 100,
+          "minimumRoundTripTime": 50,
+          "maximumRoundTripTime": 500,
+          "authentication": {
+            "username": "<string>",
+            "passphrase": "<string>"
+          },
+          "security": {
+            "decryptionMode": "Disabled",
+            "passphrase": "<string>"
+          },
+          "receiveMode": "On"
+        },
+        "channelId": "",
+        "tsBackup": {
+          "tsBackupMode": "Floating",
+          "delayMainToBackup": 0,
+          "delayBackupToMain": 10,
+          "backupActivationMode": "Always",
+          "activeBackupTS": "<integer>",
+          "backupTSs": [
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            }
+          ]
+        },
+        "bandwidthLimit": {
+          "mode": "Default",
+          "bitrate": "<integer>"
+        },
+        "RTP_BufferMode": "Default",
+        "reorderWindowReadoutLevel": 16,
+        "reorderWindowReadoutDelay": 10,
+        "udpStreamLossTimeOutMode": "FollowDefault",
+        "udpStreamLossTimeOut": 2500
+      },
+      "dvbtSettings": {
+        "interface": "<string>",
+        "frequency": "<integer>",
+        "channelBandwidth": 8,
+        "targetUdp": 65535,
+        "tsStandard": "Default",
+        "tsLossTriggers": {
+          "triggerMode": "Specific",
+          "triggers": [
+            {
+              "trigger": "InputLoss"
+            }
+          ]
+        },
+        "tsBackup": {
+          "tsBackupMode": "Floating",
+          "delayMainToBackup": 0,
+          "delayBackupToMain": 10,
+          "backupActivationMode": "Always",
+          "activeBackupTS": "<integer>",
+          "backupTSs": [
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            }
+          ]
+        },
+        "channelId": "",
+        "bandwidthLimit": {
+          "mode": "Default",
+          "bitrate": "<integer>"
+        }
+      },
+      "dvbs2Settings": {
+        "interface": "<string>",
+        "DVBS_Mode": "DVB_S2",
+        "frequency": 3449000,
+        "isi": "<integer>",
+        "tsStandard": "Default",
+        "symbolRate": 30000,
+        "tsLossTriggers": {
+          "triggerMode": "Specific",
+          "triggers": [
+            {
+              "trigger": "PAT_Error"
+            }
+          ]
+        },
+        "tsBackup": {
+          "tsBackupMode": "NonRevertive",
+          "delayMainToBackup": 0,
+          "delayBackupToMain": 10,
+          "backupActivationMode": "Always",
+          "activeBackupTS": "<integer>",
+          "backupTSs": [
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            },
+            {
+              "value": "<Circular reference to #/components/schemas/Source detected>"
+            }
+          ]
+        },
+        "channelId": ""
+      },
+      "ndiSettings": {
+        "streamName": "<string>",
+        "channelId": "",
+        "allowedVideoSignal": "Blocked",
+        "inputLossTriggers": {
+          "triggers": [
+            "InputLoss",
+            "InvalidVideoFormat"
+          ]
+        },
+        "highDynamicRange": {
+          "mode": "Manual",
+          "format": "SDR",
+          "displayPrimaries": "Auto",
+          "displayMasteringLuminanceEnabled": false,
+          "displayMasteringLuminance": {
+            "min": 1,
+            "max": 10000000
+          },
+          "contentLightLevelInfoEnabled": false,
+          "contentLightLevelInfo": {
+            "maxFall": 150,
+            "maxCLL": 1000
+          }
+        }
+      }
+    },
+    "inputType": "ATSC1",
+    "xgressSettings": {
+      "serviceId": "<integer>",
+      "serviceUserName": "<string>",
+      "serviceLossTriggers": {
+        "triggerMode": "Default",
+        "triggers": [
+          {
+            "trigger": "MissingInPAT"
+          }
+        ],
+        "pidType": "Smart",
+        "pidList": [
+          "<integer>"
+        ]
+      },
+      "syncId": "",
+      "scte35Offset": 0
+    },
+    "abr2tsSettings": {
+      "serviceId": "<integer>",
+      "serviceUserName": "<string>",
+      "serviceLossTriggers": {
+        "triggerMode": "Disabled",
+        "triggers": [
+          {
+            "trigger": "UdpStreamLoss"
+          }
+        ],
+        "pidType": "Smart",
+        "pidList": [
+          "<integer>"
+        ]
+      },
+      "syncId": "",
+      "scte35Offset": 0
+    },
+    "sdiSettings": {
+      "serviceUserName": "<string>",
+      "audioSources": [
+        {
+          "sourceId": "<integer>",
+          "mode": "5.1.4",
+          "LR": "<integer>",
+          "LR_essence": "<string>",
+          "backupEnable": false,
+          "LR_backup": "<integer>",
+          "C_LFE_essence": "<string>",
+          "C_LFE": "<integer>",
+          "LsRs_essence": "<string>",
+          "LsRs": "<integer>",
+          "TflTfr_essence": "<string>",
+          "TflTfr": "<integer>",
+          "TblTbr_essence": "<string>",
+          "TblTbr": "<integer>",
+          "LbRb_essence": "<string>",
+          "LbRb": "<integer>",
+          "modifyAudioDescriptor": false,
+          "outputLanguage": "",
+          "audioOutputType": "Undefined"
+        }
+      ]
+    },
+    "asiSettings": {
+      "serviceId": "<integer>",
+      "serviceUserName": "<string>",
+      "serviceLossTriggers": {
+        "triggerMode": "Disabled",
+        "triggers": [
+          {
+            "trigger": "InputLoss"
+          }
+        ],
+        "pidType": "Smart",
+        "pidList": [
+          "<integer>"
+        ]
+      },
+      "scte35Offset": 0
+    },
+    "isdbtSettings": {
+      "serviceId": "<integer>",
+      "serviceUserName": "<string>",
+      "serviceLossTriggers": {
+        "triggerMode": "Specific",
+        "triggers": [
+          {
+            "trigger": "PidBitRateError"
+          }
+        ],
+        "pidType": "Smart",
+        "pidList": [
+          "<integer>"
+        ]
+      },
+      "scte35Offset": 0
+    },
+    "atsc1Settings": {
+      "serviceId": "<integer>",
+      "serviceUserName": "<string>",
+      "serviceLossTriggers": {
+        "triggerMode": "Default",
+        "triggers": [
+          {
+            "trigger": "ScrambledService"
+          }
+        ],
+        "pidType": "Smart",
+        "pidList": [
+          "<integer>"
+        ]
+      },
+      "scte35Offset": 0
+    },
+    "atsc3Settings": {
+      "serviceId": "<integer>",
+      "serviceUserName": "<string>",
+      "serviceLossTriggers": {
+        "triggerMode": "Disabled",
+        "triggers": [
+          {
+            "trigger": "MissingInPMT"
+          }
+        ],
+        "pidType": "Smart",
+        "pidList": [
+          "<integer>"
+        ]
+      }
+    },
+    "dvbtSettings": {
+      "serviceId": "<integer>",
+      "serviceUserName": "<string>",
+      "serviceLossTriggers": {
+        "triggerMode": "Disabled",
+        "triggers": [
+          {
+            "trigger": "PidError"
+          }
+        ],
+        "pidType": "Smart",
+        "pidList": [
+          "<integer>"
+        ]
+      },
+      "scte35Offset": 0
+    },
+    "dvbs2Settings": {
+      "serviceId": "<integer>",
+      "serviceUserName": "<string>",
+      "serviceLossTriggers": {
+        "triggerMode": "Default",
+        "triggers": [
+          {
+            "trigger": "CC_ErroredSecs"
+          }
+        ],
+        "pidType": "Smart",
+        "pidList": [
+          "<integer>"
+        ]
+      },
+      "scte35Offset": 0
+    }
+  },
+  "source": {
+    "inputType": "ZIXI",
+    "xgressSettings": {
+      "interface": "<string>",
+      "targetUdp": "<integer>",
+      "vlanId": 0,
+      "sourceIp": "0.0.0.0",
+      "targetIp": "0.0.0.0",
+      "sourceIps": [
+        "<ipv4>"
+      ],
+      "tsStandard": "Default",
+      "sptsRoutingMode": "Default",
+      "timeBaseSelection": {
+        "mode": "Default",
+        "sid": "<integer>",
+        "fastLockMode": false
+      },
+      "tsFEC": {
+        "triggerMode": "Default",
+        "columnFEC": {
+          "targetIp": "0.0.0.0",
+          "targetUdp": "<integer>"
+        },
+        "rowFEC": {
+          "targetIp": "0.0.0.0",
+          "targetUdp": "<integer>"
+        }
+      },
+      "tsLossTriggers": {
+        "triggerMode": "Default",
+        "triggers": [
+          {
+            "trigger": "PAT_Error"
+          }
+        ]
+      },
+      "packetCounterThresholds": {
+        "mode": "Default",
+        "fixedPackets": 0,
+        "missingPacketsBeforeErrorCorrection": 0,
+        "missingPacketsAfterErrorCorrection": 0,
+        "packetsOutOfRange": 0
+      },
+      "hitlessMerge": {
+        "mode": "Default",
+        "backupSocket": {
+          "targetIp": "<string>"
+        }
+      },
+      "tsBackup": {
+        "tsBackupMode": "Floating",
+        "delayMainToBackup": 0,
+        "delayBackupToMain": 10,
+        "backupActivationMode": "Always",
+        "activeBackupTS": "<integer>",
+        "backupTSs": [
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          }
+        ]
+      },
+      "channelId": "",
+      "bandwidthLimit": {
+        "mode": "Default",
+        "bitrate": "<integer>"
+      },
+      "RTP_BufferMode": "Default",
+      "reorderWindowReadoutLevel": 16,
+      "reorderWindowReadoutDelay": 10,
+      "udpStreamLossTimeOutMode": "FollowDefault",
+      "udpStreamLossTimeOut": 2500
+    },
+    "abr2tsSettings": {
+      "protocol": "ABR",
+      "ABR_Url": "<string>",
+      "backupUrl": "",
+      "secondaryMainUrl": "",
+      "secondaryBackupUrl": "",
+      "tsOverHttpLatency": 2000,
+      "streamKey": "<uuid>",
+      "updateStreamKey": false,
+      "targetUdp": 65535,
+      "tsStandard": "Default",
+      "tsLossTriggers": {
+        "triggerMode": "Specific",
+        "triggers": [
+          {
+            "trigger": "ServiceLoss"
+          }
+        ]
+      },
+      "decryption": {
+        "mode": "Disabled",
+        "staticKey": "<string>",
+        "initializationVector": "<string>"
+      },
+      "latency": 300,
+      "deterministicLatency": false,
+      "forceServiceId": false,
+      "serviceId": "<integer>",
+      "receiveMode": "On",
+      "timeShiftDelay": 0,
+      "tsBackup": {
+        "tsBackupMode": "Mixed",
+        "delayMainToBackup": 0,
+        "delayBackupToMain": 10,
+        "backupActivationMode": "Always",
+        "activeBackupTS": "<integer>",
+        "backupTSs": [
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          }
+        ]
+      },
+      "channelId": "",
+      "bandwidthLimit": {
+        "mode": "Default",
+        "bitrate": "<integer>"
+      },
+      "udpStreamLossTimeOutMode": "FollowDefault",
+      "udpStreamLossTimeOut": 2500
+    },
+    "zixiSettings": {
+      "source": {
+        "streamName": "<string>",
+        "sourceIP": "0.0.0.0",
+        "sourceUdp": 1024,
+        "altSourceIPs": [
+          "<string>"
+        ],
+        "requestUdp": 0,
+        "interface": "Any"
+      },
+      "targetUdp": 65535,
+      "tsStandard": "Default",
+      "streamType": "Pull",
+      "latency": 3000,
+      "timeBaseSelection": {
+        "mode": "Default",
+        "sid": "<integer>",
+        "fastLockMode": false
+      },
+      "security": {
+        "userName": "",
+        "passphrase": "",
+        "decrypt": "Disabled",
+        "decryptKey": ""
+      },
+      "tsLossTriggers": {
+        "triggerMode": "Default",
+        "triggers": [
+          {
+            "trigger": "UdpStreamLoss"
+          }
+        ]
+      },
+      "channelId": "",
+      "tsBackup": {
+        "tsBackupMode": "Mixed",
+        "delayMainToBackup": 0,
+        "delayBackupToMain": 10,
+        "backupActivationMode": "Always",
+        "activeBackupTS": "<integer>",
+        "backupTSs": [
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          }
+        ]
+      },
+      "bandwidthLimit": {
+        "mode": "Default",
+        "bitrate": "<integer>"
+      },
+      "RTP_BufferMode": "Default",
+      "reorderWindowReadoutLevel": 16,
+      "reorderWindowReadoutDelay": 10,
+      "udpStreamLossTimeOutMode": "FollowDefault",
+      "udpStreamLossTimeOut": 2500
+    },
+    "sdiSettings": {
+      "interface": "<string>",
+      "userName": "<string>",
+      "channelId": "",
+      "VBI": {
+        "SD_VBI": [
+          {
+            "type": "WSS",
+            "field": "Field2",
+            "line": "<integer>",
+            "alarmTrigger": "Disabled",
+            "alarmDebounceBegin": 500,
+            "alarmDebounceEnd": 500
+          }
+        ],
+        "HD_VBI": {
+          "alarmTrigger": "Disabled",
+          "alarmDebounceBegin": 500,
+          "alarmDebounceEnd": 500
+        }
+      },
+      "sdiLossTriggers": {
+        "triggers": [
+          "SDI_InputLoss",
+          "InvalidVideoFormat"
+        ]
+      },
+      "smpte2038": [
+        {
+          "DID": "<integer>",
+          "SDID": "<integer>"
+        },
+        {
+          "DID": "<integer>",
+          "SDID": "<integer>"
+        },
+        {
+          "DID": "<integer>",
+          "SDID": "<integer>"
+        }
+      ],
+      "highDynamicRange": {
+        "mode": "Manual",
+        "format": "SDR",
+        "displayPrimaries": "Auto",
+        "displayMasteringLuminanceEnabled": false,
+        "displayMasteringLuminance": {
+          "min": 1,
+          "max": 10000000
+        },
+        "contentLightLevelInfoEnabled": false,
+        "contentLightLevelInfo": {
+          "maxFall": 150,
+          "maxCLL": 1000
+        }
+      }
+    },
+    "st20226Settings": {
+      "interface": "<string>",
+      "userName": "<string>",
+      "targetUdp": "<integer>",
+      "targetIp": "0.0.0.0",
+      "sourceIps": [
+        "<ipv4>"
+      ],
+      "allowedVideoSignal": "Blocked",
+      "playoutDelay": 10,
+      "hitlessMergeEnabled": false,
+      "backupSocket": {
+        "targetUdp": "<integer>",
+        "targetIp": "0.0.0.0",
+        "sourceIp": "0.0.0.0"
+      },
+      "streamBackup": {
+        "switchOverDelay": 0,
+        "joinDelay": 15,
+        "activeBackupStream": 0,
+        "backupStreams": [
+          {
+            "mainSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            },
+            "hitlessMergeEnabled": false,
+            "backupSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            }
+          },
+          {
+            "mainSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            },
+            "hitlessMergeEnabled": false,
+            "backupSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            }
+          },
+          {
+            "mainSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            },
+            "hitlessMergeEnabled": false,
+            "backupSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            }
+          },
+          {
+            "mainSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            },
+            "hitlessMergeEnabled": false,
+            "backupSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            }
+          },
+          {
+            "mainSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            },
+            "hitlessMergeEnabled": false,
+            "backupSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            }
+          },
+          {
+            "mainSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            },
+            "hitlessMergeEnabled": false,
+            "backupSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            }
+          },
+          {
+            "mainSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            },
+            "hitlessMergeEnabled": false,
+            "backupSocket": {
+              "targetIp": "<ipv4>",
+              "targetUdp": "<integer>",
+              "sourceIp": "<ipv4>"
+            }
+          }
+        ]
+      },
+      "packetCounterThresholds": {
+        "missingPacketsBeforeErrorCorrection": 0,
+        "missingPacketsAfterErrorCorrection": 0,
+        "packetsOutOfRange": 0
+      },
+      "channelId": "",
+      "VBI": {
+        "SD_VBI": [
+          {
+            "type": "WST",
+            "field": "Field1",
+            "line": "<integer>",
+            "alarmTrigger": "Disabled",
+            "alarmDebounceBegin": 500,
+            "alarmDebounceEnd": 500
+          }
+        ],
+        "HD_VBI": {
+          "alarmTrigger": "Disabled",
+          "alarmDebounceBegin": 500,
+          "alarmDebounceEnd": 500
+        }
+      },
+      "sdiLossTriggers": {
+        "triggers": [
+          "SDI_InputLoss",
+          "InvalidVideoFormat"
+        ]
+      },
+      "smpte2038": [
+        {
+          "DID": "<integer>",
+          "SDID": "<integer>"
+        },
+        {
+          "DID": "<integer>",
+          "SDID": "<integer>"
+        },
+        {
+          "DID": "<integer>",
+          "SDID": "<integer>"
+        }
+      ],
+      "highDynamicRange": {
+        "mode": "Manual",
+        "format": "SDR",
+        "displayPrimaries": "Auto",
+        "displayMasteringLuminanceEnabled": false,
+        "displayMasteringLuminance": {
+          "min": 1,
+          "max": 10000000
+        },
+        "contentLightLevelInfoEnabled": false,
+        "contentLightLevelInfo": {
+          "maxFall": 150,
+          "maxCLL": 1000
+        }
+      }
+    },
+    "tsfileSettings": {
+      "source": {
+        "fileName": "<string>",
+        "streaming": "<boolean>",
+        "udpSize": 7,
+        "updateCC": true,
+        "makeLoopContinuous": true
+      },
+      "targetUdp": 65535,
+      "tsStandard": "Default",
+      "timeBaseSelection": {
+        "mode": "Default",
+        "sid": "<integer>",
+        "fastLockMode": false
+      },
+      "tsLossTriggers": {
+        "triggerMode": "Default",
+        "triggers": [
+          {
+            "trigger": "PAT_Error"
+          }
+        ]
+      },
+      "channelId": "",
+      "bandwidthLimit": {
+        "mode": "Default",
+        "bitrate": "<integer>"
+      },
+      "RTP_BufferMode": "Default",
+      "reorderWindowReadoutLevel": 16,
+      "reorderWindowReadoutDelay": 10,
+      "udpStreamLossTimeOutMode": "FollowDefault",
+      "udpStreamLossTimeOut": 2500
+    },
+    "srtSettings": {
+      "source": {
+        "sourceIP": "<string>",
+        "sourceUdp": 0,
+        "receptionPort": 0,
+        "interface": "Any",
+        "vlanId": 0
+      },
+      "targetUdp": 65535,
+      "mode": "Listener",
+      "tsStandard": "Default",
+      "sptsRoutingMode": "Default",
+      "latency": 200,
+      "overruleBufferSize": false,
+      "bufferSize": "<integer>",
+      "streamId": "",
+      "receiveMode": "On",
+      "lostPacketsThreshold": 0,
+      "droppedPacketsThreshold": 0,
+      "timeBaseSelection": {
+        "mode": "Default",
+        "sid": "<integer>",
+        "fastLockMode": false
+      },
+      "security": {
+        "passphrase": "",
+        "keyLength": "Disabled"
+      },
+      "tsLossTriggers": {
+        "triggerMode": "Default",
+        "triggers": [
+          {
+            "trigger": "ServiceLoss"
+          }
+        ]
+      },
+      "tsfec": {
+        "mode": "Disabled",
+        "autoRepeat": "OnRequest"
+      },
+      "hitlessMerge": "Disabled",
+      "backupStream": {
+        "source": {
+          "sourceIP": "<string>",
+          "sourceUdp": 0,
+          "receptionPort": 0,
+          "interface": "Any",
+          "vlanId": 0
+        },
+        "mode": "Listener",
+        "security": {
+          "passphrase": "",
+          "keyLength": "Disabled"
+        },
+        "tsfec": {
+          "mode": "Disabled",
+          "autoRepeat": "OnRequest"
+        },
+        "streamId": "",
+        "receiveMode": "On"
+      },
+      "channelId": "",
+      "tsBackup": {
+        "tsBackupMode": "NonRevertive",
+        "delayMainToBackup": 0,
+        "delayBackupToMain": 10,
+        "backupActivationMode": "Always",
+        "activeBackupTS": "<integer>",
+        "backupTSs": [
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          }
+        ]
+      },
+      "bandwidthLimit": {
+        "mode": "Default",
+        "bitrate": "<integer>"
+      },
+      "RTP_BufferMode": "Default",
+      "reorderWindowReadoutLevel": 16,
+      "reorderWindowReadoutDelay": 10,
+      "udpStreamLossTimeOutMode": "FollowDefault",
+      "udpStreamLossTimeOut": 2500
+    },
+    "st2110Settings": {
+      "interface": "<string>",
+      "userName": "<string>",
+      "streamUUID": "00000000-0000-0000-0000-000000000000",
+      "essences": [
+        {
+          "targetUdp": "<integer>",
+          "type": "Video",
+          "language": "<string>",
+          "userName": "",
+          "receiverUUID": "00000000-0000-0000-0000-000000000000",
+          "senderUUID": "00000000-0000-0000-0000-000000000000",
+          "masterEnabled": true,
+          "mainEnabled": true,
+          "sdp": "<string>",
+          "targetIp": "0.0.0.0",
+          "sourceIps": [
+            "<ipv4>"
+          ],
+          "hitlessMergeEnabled": false,
+          "backupSocket": {
+            "targetUdp": "<integer>",
+            "targetIp": "0.0.0.0",
+            "sourceIp": "0.0.0.0"
+          },
+          "playoutDelay": 10,
+          "packetCounterThresholds": {
+            "missingPacketsBeforeErrorCorrection": 0,
+            "missingPacketsAfterErrorCorrection": 0,
+            "packetsOutOfRange": 0
+          },
+          "channelId": ""
+        }
+      ],
+      "VBI": {
+        "HD_VBI": {
+          "alarmTrigger": "Disabled",
+          "alarmDebounceBegin": 500,
+          "alarmDebounceEnd": 500
+        }
+      },
+      "allowedVideoSignal": "UpToHD",
+      "serviceDelay": 10,
+      "channelId": "",
+      "playoutDelay": 10,
+      "sdiLossTriggers": {
+        "triggers": [
+          "SDI_InputLoss",
+          "InvalidVideoFormat"
+        ]
+      },
+      "smpte2038": [
+        {
+          "DID": "<integer>",
+          "SDID": "<integer>"
+        },
+        {
+          "DID": "<integer>",
+          "SDID": "<integer>"
+        },
+        {
+          "DID": "<integer>",
+          "SDID": "<integer>"
+        }
+      ],
+      "highDynamicRange": {
+        "mode": "Manual",
+        "format": "SDR",
+        "displayPrimaries": "Auto",
+        "displayMasteringLuminanceEnabled": false,
+        "displayMasteringLuminance": {
+          "min": 1,
+          "max": 10000000
+        },
+        "contentLightLevelInfoEnabled": false,
+        "contentLightLevelInfo": {
+          "maxFall": 150,
+          "maxCLL": 1000
+        }
+      }
+    },
+    "asiSettings": {
+      "interface": "<string>",
+      "tsStandard": "Default",
+      "tsLossTriggers": {
+        "triggerMode": "Specific",
+        "triggers": [
+          {
+            "trigger": "InputLoss"
+          }
+        ]
+      },
+      "channelId": "",
+      "tsBackup": {
+        "tsBackupMode": "Revertive",
+        "delayMainToBackup": 0,
+        "delayBackupToMain": 10,
+        "backupActivationMode": "Always",
+        "activeBackupTS": "<integer>",
+        "backupTSs": [
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          }
+        ]
+      },
+      "bandwidthLimit": {
+        "mode": "Default",
+        "bitrate": "<integer>"
+      }
+    },
+    "isdbtSettings": {
+      "interface": "<string>",
+      "frequency": "<integer>",
+      "channelBandwidth": 6,
+      "subChannel": 22,
+      "segments": 13,
+      "targetUdp": 65535,
+      "tsStandard": "Default",
+      "tsLossTriggers": {
+        "triggerMode": "Specific",
+        "triggers": [
+          {
+            "trigger": "InputLoss"
+          }
+        ]
+      },
+      "tsBackup": {
+        "tsBackupMode": "Floating",
+        "delayMainToBackup": 0,
+        "delayBackupToMain": 10,
+        "backupActivationMode": "Always",
+        "activeBackupTS": "<integer>",
+        "backupTSs": [
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          }
+        ]
+      },
+      "channelId": "",
+      "bandwidthLimit": {
+        "mode": "Default",
+        "bitrate": "<integer>"
+      }
+    },
+    "atsc1Settings": {
+      "interface": "<string>",
+      "frequency": "<integer>",
+      "targetUdp": 65535,
+      "tsStandard": "Default",
+      "tsLossTriggers": {
+        "triggerMode": "Disabled",
+        "triggers": [
+          {
+            "trigger": "ServiceLoss"
+          }
+        ]
+      },
+      "tsBackup": {
+        "tsBackupMode": "Floating",
+        "delayMainToBackup": 0,
+        "delayBackupToMain": 10,
+        "backupActivationMode": "Always",
+        "activeBackupTS": "<integer>",
+        "backupTSs": [
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          }
+        ]
+      },
+      "channelId": "",
+      "bandwidthLimit": {
+        "mode": "Default",
+        "bitrate": "<integer>"
+      }
+    },
+    "atsc3Settings": {
+      "interface": "<string>",
+      "targetUdp": 65535,
+      "receiverId": "00000000-0000-0000-0000-000000000000",
+      "receiverName": "<string>",
+      "atscServiceId": "<long>",
+      "tsStandard": "Default",
+      "tsLossTriggers": {
+        "triggerMode": "Default",
+        "triggers": [
+          {
+            "trigger": "ServiceLoss"
+          }
+        ]
+      },
+      "tsBackup": {
+        "tsBackupMode": "Floating",
+        "delayMainToBackup": 0,
+        "delayBackupToMain": 10,
+        "backupActivationMode": "Always",
+        "activeBackupTS": "<integer>",
+        "backupTSs": [
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          }
+        ]
+      },
+      "channelId": "",
+      "bandwidthLimit": {
+        "mode": "Default",
+        "bitrate": "<integer>"
+      }
+    },
+    "ristSettings": {
+      "source": {
+        "sourceIP": "<string>",
+        "sourceUdp": 0,
+        "receptionPort": 0,
+        "interface": "Any"
+      },
+      "targetUdp": 65535,
+      "mode": "Listener",
+      "tsStandard": "Default",
+      "profile": "Simple",
+      "bufferSize": 1000,
+      "reorderBuffer": 100,
+      "maximumBandwidth": 100000,
+      "returnBandwidth": 100,
+      "minimumRoundTripTime": 50,
+      "maximumRoundTripTime": 500,
+      "authentication": {
+        "username": "<string>",
+        "passphrase": "<string>"
+      },
+      "security": {
+        "decryptionMode": "Disabled",
+        "passphrase": "<string>"
+      },
+      "receiveMode": "On",
+      "timeBaseSelection": {
+        "mode": "Default",
+        "sid": "<integer>",
+        "fastLockMode": false
+      },
+      "tsLossTriggers": {
+        "triggerMode": "Specific",
+        "triggers": [
+          {
+            "trigger": "SyncByteError"
+          }
+        ]
+      },
+      "hitlessMerge": "Disabled",
+      "backupStream": {
+        "source": {
+          "sourceIP": "<string>",
+          "sourceUdp": 0,
+          "receptionPort": 0,
+          "interface": "Any"
+        },
+        "mode": "Listener",
+        "profile": "Simple",
+        "reorderBuffer": 100,
+        "maximumBandwidth": 100000,
+        "returnBandwidth": 100,
+        "minimumRoundTripTime": 50,
+        "maximumRoundTripTime": 500,
+        "authentication": {
+          "username": "<string>",
+          "passphrase": "<string>"
+        },
+        "security": {
+          "decryptionMode": "Disabled",
+          "passphrase": "<string>"
+        },
+        "receiveMode": "On"
+      },
+      "channelId": "",
+      "tsBackup": {
+        "tsBackupMode": "Floating",
+        "delayMainToBackup": 0,
+        "delayBackupToMain": 10,
+        "backupActivationMode": "Always",
+        "activeBackupTS": "<integer>",
+        "backupTSs": [
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          }
+        ]
+      },
+      "bandwidthLimit": {
+        "mode": "Default",
+        "bitrate": "<integer>"
+      },
+      "RTP_BufferMode": "Default",
+      "reorderWindowReadoutLevel": 16,
+      "reorderWindowReadoutDelay": 10,
+      "udpStreamLossTimeOutMode": "FollowDefault",
+      "udpStreamLossTimeOut": 2500
+    },
+    "dvbtSettings": {
+      "interface": "<string>",
+      "frequency": "<integer>",
+      "channelBandwidth": 8,
+      "targetUdp": 65535,
+      "tsStandard": "Default",
+      "tsLossTriggers": {
+        "triggerMode": "Disabled",
+        "triggers": [
+          {
+            "trigger": "SyncByteError"
+          }
+        ]
+      },
+      "tsBackup": {
+        "tsBackupMode": "NonRevertive",
+        "delayMainToBackup": 0,
+        "delayBackupToMain": 10,
+        "backupActivationMode": "Always",
+        "activeBackupTS": "<integer>",
+        "backupTSs": [
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          }
+        ]
+      },
+      "channelId": "",
+      "bandwidthLimit": {
+        "mode": "Default",
+        "bitrate": "<integer>"
+      }
+    },
+    "dvbs2Settings": {
+      "interface": "<string>",
+      "DVBS_Mode": "DVB_S",
+      "frequency": 3449000,
+      "isi": "<integer>",
+      "tsStandard": "Default",
+      "symbolRate": 30000,
+      "tsLossTriggers": {
+        "triggerMode": "Specific",
+        "triggers": [
+          {
+            "trigger": "InputLoss"
+          }
+        ]
+      },
+      "tsBackup": {
+        "tsBackupMode": "NonRevertive",
+        "delayMainToBackup": 0,
+        "delayBackupToMain": 10,
+        "backupActivationMode": "Always",
+        "activeBackupTS": "<integer>",
+        "backupTSs": [
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          },
+          {
+            "value": "<Circular reference to #/components/schemas/Source detected>"
+          }
+        ]
+      },
+      "channelId": ""
+    },
+    "ndiSettings": {
+      "streamName": "<string>",
+      "channelId": "",
+      "allowedVideoSignal": "Blocked",
+      "inputLossTriggers": {
+        "triggers": [
+          "InputLoss",
+          "InvalidVideoFormat"
+        ]
+      },
+      "highDynamicRange": {
+        "mode": "Manual",
+        "format": "SDR",
+        "displayPrimaries": "Auto",
+        "displayMasteringLuminanceEnabled": false,
+        "displayMasteringLuminance": {
+          "min": 1,
+          "max": 10000000
+        },
+        "contentLightLevelInfoEnabled": false,
+        "contentLightLevelInfo": {
+          "maxFall": 150,
+          "maxCLL": 1000
+        }
+      }
+    }
+  }
+}

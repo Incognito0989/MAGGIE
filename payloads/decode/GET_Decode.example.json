@@ -1,0 +1,155 @@
+{
+    "id": "1fc62540-ede2-4786-bf2e-cf4414cebf69",
+    "url": "https://10.4.11.68:8443/api/v2/DecodeServices/1fc62540-ede2-4786-bf2e-cf4414cebf69",
+    "sw_ref": "2-65534-8-2-",
+    "name": "ojernenr",
+    "inputService": {
+        "id": "0001fffc-0000-0002-0000-00020000000e",
+        "url": "https://10.4.11.68:8443/api/v2/InputServices/0001fffc-0000-0002-0000-00020000000e",
+        "sw_ref": "1-65532-2-2-",
+        "source": {
+            "id": "0001fffc-0000-0002-0000-00000000000e",
+            "url": "https://10.4.11.68:8443/api/v2/Sources/0001fffc-0000-0002-0000-00000000000e",
+            "sw_ref": "1-65532-2--",
+            "inputType": "DVB-T",
+            "dvbtSettings": {
+                "interface": "RF1",
+                "frequency": 42000000,
+                "targetUdp": 25002,
+                "tsStandard": "Default"
+            }
+        },
+        "inputType": "DVB-T",
+        "dvbtSettings": {
+            "serviceId": 2,
+            "serviceUserName": "ojernenr"
+        }
+    },
+    "descrambling": null,
+    "descrambledService": {
+        "descrambledServiceId": null,
+        "descrambledServiceUrl": null
+    },
+    "processing": {
+        "id": "1fc62540-ede2-4786-bf2e-cf4414cebf69",
+        "url": "https://10.4.11.68:8443/api/v2/DecodeProcessing/1fc62540-ede2-4786-bf2e-cf4414cebf69",
+        "sw_ref": "2-65534-8-2-",
+        "processingType": "Decode",
+        "serviceId": "1fc62540-ede2-4786-bf2e-cf4414cebf69",
+        "media": {
+            "timeCodeBurnIn": false,
+            "logos": [],
+            "LBand": {
+                "lBandMode": "Disabled",
+                "leftRightLogoName": null,
+                "leftRightLogoId": null,
+                "topBottomLogoName": null,
+                "topBottomLogoId": null,
+                "freeStandingLogoName": null,
+                "freeStandingLogoId": null,
+                "display": null,
+                "displayAfterReboot": null
+            },
+            "bannerSettings": {
+                "allowedBanner": "NotAllowed",
+                "screenLogos": "Hide",
+                "easAlerts": "DontAllow"
+            },
+            "slateSettings": {
+                "mode": "Disabled",
+                "slates": [],
+                "slateTriggers": []
+            },
+            "subtitleBurnIn": {
+                "mode": "Disabled",
+                "language": null,
+                "fontName": null,
+                "forcedTimeoutMode": null,
+                "forcedTimeout": null
+            }
+        },
+        "trackRules": [],
+        "channelId": "",
+        "serviceSettings": {
+            "userName": "ojernenr",
+            "serviceLossTriggers": {
+                "triggers": [
+                    "VideoInputLoss",
+                    "AudioInputLoss",
+                    "FormatMismatch",
+                    "ProcessingError"
+                ]
+            }
+        },
+        "serviceBackup": {
+            "serviceBackupMode": "NonRevertive",
+            "delayMainToBackup": 0,
+            "delayBackupToMain": 10
+        },
+        "videoSettings": {
+            "processingMode": "Decode",
+            "decodeSource": {
+                "tracktype": "StreamType",
+                "sourcePid": null,
+                "streamType": "MPEG2",
+                "componentTag": null,
+                "freezeFrameDetection": "Disabled",
+                "freezeFrameThreshold": null,
+                "topLineBlanking": 0,
+                "horizontalSharpness": 12,
+                "verticalSharpness": 18,
+                "IT_Detection": "Disabled",
+                "croppingSettings": {
+                    "mode": "Disabled",
+                    "topOffset": null,
+                    "bottomOffset": null,
+                    "leftOffset": null,
+                    "rightOffset": null
+                },
+                "videoInputLoss": "BlackFrames"
+            },
+            "decodes": [
+                {
+                    "decodeName": "VideoProfile#1",
+                    "format": "HD",
+                    "resolutionMode": "FollowInput",
+                    "hResolution": null,
+                    "vResolution": null,
+                    "frameRate": null,
+                    "afdArOutputMode": null,
+                    "afdArOutputAr": null,
+                    "afdArSourceMode": null,
+                    "arSourceSelection": null,
+                    "afdSourceSelection": null,
+                    "detailEnhancement": "Disabled"
+                }
+            ]
+        },
+        "audioSettings": []
+    },
+    "outputs": [
+        {
+            "id": "00020001-0000-0006-0000-000000000002",
+            "url": "https://10.4.11.68:8443/api/v2/DecodeOutputs/00020001-0000-0006-0000-000000000002",
+            "sw_ref": "2-1-6--",
+            "interface": "SDI2",
+            "outputType": "SDI",
+            "userName": null,
+            "sdiSettings": {
+                "sdiComponents": [
+                    {
+                        "id": "00020001-0000-0006-0000-000000000001",
+                        "url": "https://10.4.11.68:8443/api/v2/DecodeOutputs/00020001-0000-0006-0000-000000000002/SDI_Components/00020001-0000-0006-0000-000000000001",
+                        "sw_ref": "2-1-6--",
+                        "type": "Video",
+                        "userName": "Video",
+                        "videoSettings": {
+                            "processingServiceId": "1fc62540-ede2-4786-bf2e-cf4414cebf69",
+                            "videoDecodeName": "VideoProfile#1"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

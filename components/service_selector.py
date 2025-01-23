@@ -3,6 +3,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from pathlib import Path
 
+from components.file_dropper import FileDropper
+
 class ServiceConfigSelector(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -34,6 +36,10 @@ class ServiceConfigSelector(tk.Frame):
         self.save_button.pack(side=tk.LEFT, padx=5)
         self.save_as_button = ttk.Button(button_frame, text="Save As New", command=self.save_file_as_new)
         self.save_as_button.pack(side=tk.LEFT, padx=5)
+
+            #file dropper
+        dropper = FileDropper(self)
+        dropper.pack(padx=50)
 
         # Bind events
         self.service_type_menu.bind("<<ComboboxSelected>>", lambda e: self.load_config_files())
