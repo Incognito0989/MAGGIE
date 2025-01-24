@@ -1,0 +1,15 @@
+certifi==2024.12.14
+cffi==1.17.1
+charset-normalizer==3.4.0
+cryptography==44.0.0
+idna==3.10
+pillow==11.0.0
+ply==3.11
+pyasn1==0.4.8
+pyasyncore==1.0.4
+pycparser==2.22
+pysmi==1.2.1
+pysnmp==5.1.0
+pysnmpcrypto==0.0.4
+requests==2.32.3
+urllib3==2.2.3
