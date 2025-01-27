@@ -31,52 +31,6 @@ class RedirectedOutput:
     def flush(self):  # To handle interactive environments
         pass
 
-def send_payload_all(request_type, payload):
-    print()
-    print("INITIATING PAYLOAD PROCESS")
-
-    #Get all operational ports to configure
-    update_all_ports(switch_ip, 1)
-    ports = get_active_ports(switch_ip)
-    print("ACTIVE PORTS: ")
-    print(ports)
-
-    # turn off all ports except management
-    print("Turning off all ports")
-    update_all_ports(switch_ip, 2)
-    # print(get_all_port_status(switch_ip))
-
-    # send payload for each port
-    for port in ports:
-        print()
-
-        # (port - 1) because the first port is number 2. this is done for readability
-        print(f"===================MEG CONFIG ON PORT {(int(port) - 1)}========================")
-        print(f"Turning port {port} on")
-        set_port(switch_ip, port, 1)      # Turn port on
-
-        sleep(6)                  # wait for meg to be reachable
-
-        if is_ip_reachable(base_meg_ip):
-            print("Meg is reachable. Continuing with payload")
-        else:
-            print("Meg is not reachable. Skipping this port")
-            continue
-
-        # Get auth for this meg
-        print("Getting authorization to meg")
-        post_auth(base_meg_ip)
-
-        # make post request to meg
-        process_service_for_ip(request_type, base_meg_ip, payload)
-        
-        # Turn port off
-        set_port(switch_ip, port, 2)      
-    update_all_ports(switch_ip, 1)
-    print()
-    print("==============================================")
-    print("PAYLOAD PROCESS COMPLETE")
-
 def create_tool_tab(notebook, services_dir):
     # Create Tool tab
     tool_tab = ttk.Frame(notebook)
@@ -190,13 +144,8 @@ def create_tool_tab(notebook, services_dir):
     begin_button.pack(side=tk.BOTTOM, expand=True, pady=10, padx=10, anchor="e")
 
     # Create and pack the Status Panel on the right side
-    # status_panel = StatusPanel(config_frame, port_count=20)
-    # status_panel.pack(side="right", fill="y", padx=10, pady=10)
-
-    # # Example update: Set some ports to show different statuses
-    # status_panel.update_port_status(1, "off")
-    # status_panel.update_port_status(2, "failed")
-    # status_panel.update_port_status(3, "complete")
+    status_panel = StatusPanel(tool_tab, ports=48, width=tool_tab.winfo_screenwidth(), height=100)
+    status_panel.pack(pady=20)
 
     # Console output display
     console_output = tk.Text(tool_tab, height=40, wrap="word", state="disabled")
@@ -205,5 +154,63 @@ def create_tool_tab(notebook, services_dir):
     # Redirect stdout and sderr to the Text widget
     sys.stdout = RedirectedOutput(console_output)
     sys.stderr = RedirectedOutput(console_output)
+
+    def send_payload_all(request_type, payload):
+        print()
+        print("INITIATING PAYLOAD PROCESS")
+
+        #Get all operational ports to configure
+        print("Getting operational ports")
+        update_all_ports(switch_ip, 1)
+        ports = get_active_ports(switch_ip)
+        print("ACTIVE PORTS: ")
+        print(ports)
+
+        # turn off all ports except management
+        print("Turning off all ports")
+        update_all_ports(switch_ip, 2)
+        status_panel.update_all_circle_color(status='disconnected')
+        # print(get_all_port_status(switch_ip))
+
+        # send payload for each port
+        for port in ports:
+            status_panel.update_circle_color(port, 'processing')
+            print()
+
+            # (port - 1) because the first port is number 2. this is done for readability
+            print(f"===================MEG CONFIG ON PORT {(int(port) - 1)}========================")
+            print(f"Turning port {port} on")
+            set_port(switch_ip, port, 1)      # Turn port on
+
+            sleep(6)                  # wait for meg to be reachable
+
+            if is_ip_reachable(base_meg_ip):
+                print("Meg is reachable. Continuing with payload")
+            else:
+                print("Meg is not reachable. Skipping this port")
+                status_panel.update_circle_color(port, status='failed')
+                continue
+
+            # Get auth for this meg
+            print("Getting authorization to meg")
+            if post_auth(base_meg_ip) == 'error':
+                status_panel.update_circle_color(port, 'failed')
+                continue
+            
+            # make post request to meg
+            if process_service_for_ip(request_type, base_meg_ip, payload) == 'error':
+                status_panel.update_circle_color(port, 'failed')
+                continue
+
+            # Turn port off
+            set_port(switch_ip, port, 2)  
+
+            # set status to green    
+            status_panel.update_circle_color(port, status='success')  
+        update_all_ports(switch_ip, 1)
+        print()
+        print("==============================================")
+        print("PAYLOAD PROCESS COMPLETE")
+
 
     return tool_tab

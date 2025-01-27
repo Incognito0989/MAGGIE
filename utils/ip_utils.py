@@ -3,16 +3,6 @@ import subprocess
 import platform
 from utils.api_utils import *
 
-def process_service_for_ip(service_type, ip, service_dir):
-    service_functions = {
-        "decode": post_decode_service,
-        "transcode": post_transcode_service,
-        "descramble": post_descramble_service
-    }
-    
-    if service_type in service_functions:
-        service_functions[service_type](ip, service_dir)
-
 def ip_range(start_ip, end_ip):
     start = ipaddress.ip_address(start_ip)
     end = ipaddress.ip_address(end_ip)

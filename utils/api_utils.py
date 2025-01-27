@@ -1,7 +1,19 @@
 import requests
 import json
+from settings import *
 
 TOKEN = None
+
+def process_service_for_ip(service_type, ip, service_dir):
+    service_functions = {
+        "decode": post_decode_service,
+        "transcode": post_transcode_service,
+        "descramble": post_descramble_service
+    }
+    
+    if service_type in service_functions:
+        return service_functions[service_type](ip, service_dir)
+
 
 def post_auth(base_ip):
     print(f"Getting authorization for {base_ip}")
@@ -9,17 +21,25 @@ def post_auth(base_ip):
     url = f"https://{base_ip}:8443/api/authenticate"
 
     payload = {
-      "login": "syna",
-      "password": "syna"
+      "login": rest_login,
+      "password": rest_password
     }
     headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     }
 
-    response = requests.request("POST", url, headers=headers, json=payload, verify=False)
-    TOKEN = response.json()['token']
-    print(f"SUCCESS, got token: {TOKEN}")
+    try:
+      response = requests.request("POST", url, headers=headers, json=payload, verify=False)
+      TOKEN = response.json()['token']
+      if TOKEN:
+        print(f"SUCCESS, got token: {TOKEN}")
+    except:
+       print(f"Failed to get token for {base_ip}")
+
+    if '"code": 401' in response.text:
+       return 'error'
+    return 'success'
 
 
 def post_decode_service(base_ip, payload):
@@ -37,8 +57,14 @@ def post_decode_service(base_ip, payload):
     response = requests.request("POST", url, headers=headers, json=payload, verify=False)
     print(response.text)
 
+    if 'errors' in response.text:
+       return 'error'
+    return 'success'
+
+# TODO
 def post_descramble_service(base_ip, payload):
    print(f"Posting descramble service to {base_ip} with payload: {payload}")
 
+# TODO
 def post_transcode_service(base_ip, payload):
    print(f"Posting transcode service to {base_ip} with payload: {payload}")
