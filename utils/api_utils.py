@@ -22,9 +22,9 @@ def post(url, payload):
 
 def process_service_for_ip(service_type, ip, service_dir):
     service_functions = {
-        "decode": post_decode_service,
-        "transcode": post_transcode_service,
-        "descramble": post_descramble_service
+        "Decode": post_decode_service,
+        "Transcode": post_transcode_service,
+        "Descramble": post_descramble_service
     }
     
     if service_type in service_functions:

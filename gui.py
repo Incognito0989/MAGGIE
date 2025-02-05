@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import Image, ttk
 from pathlib import Path
-from pages.tool_tab import create_tool_tab
+from pages.tool_tab import ToolTab
 from pages.config_editor_tab import create_config_editor_tab
 from pages.inventory_tab import create_inventory_tab
 from utils.logo import ResizableImageApp
@@ -27,7 +27,8 @@ notebook = ttk.Notebook(root)
 notebook.pack(fill="both", expand=True)
 
 # Add each tab by calling the create functions
-create_tool_tab(notebook, services_dir)
+toolTab = ToolTab(notebook, services_dir)
+
 create_config_editor_tab(notebook, services_dir)
 # create_inventory_tab(notebook)
 

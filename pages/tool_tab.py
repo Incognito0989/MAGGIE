@@ -6,6 +6,7 @@ from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
 import ipaddress, sys
 from components.file_dropper import FileDropper
+from components.file_selector import FileSelector
 from components.status_panel import StatusPanel
 from utils.api_utils import *
 from components.ip_range_selector import IPRangeSelector
@@ -31,186 +32,170 @@ class RedirectedOutput:
     def flush(self):  # To handle interactive environments
         pass
 
-def create_tool_tab(notebook, services_dir):
-    # Create Tool tab
-    tool_tab = ttk.Frame(notebook)
-    notebook.add(tool_tab, text="Tool")
+class ToolTab:
+    def __init__(self, notebook, services_dir):
+        self.notebook = notebook
+        self.service_dir = services_dir
+        self.processing_type = None
+        self.payload = None
 
-    # Mode selection (Config or Inventory)
-    mode_notebook = ttk.Notebook(tool_tab)
-    mode_notebook.pack(fill=tk.BOTH, expand=False, padx=10, pady=10)
+        # Create Tool tab
+        tool_tab = ttk.Frame(self.notebook)
+        self.notebook.add(tool_tab, text="Tool")
 
-    # Variables for Config tab inputs
-    selected_file = tk.StringVar()
-    selected_service_type = tk.StringVar()  # New variable for service type selection
-    inventory_file_loaded = tk.StringVar(value="No file loaded")
+        # Mode selection (Config or Inventory)
+        self.mode_notebook = ttk.Notebook(tool_tab)
+        self.mode_notebook.pack(fill=tk.BOTH, expand=False, padx=10, pady=10)
 
+        # --- Config Tab ---
+        config_frame = ttk.Frame(self.mode_notebook)
+        self.mode_notebook.add(config_frame, text="By Config")
 
-    # --- Config Tab ---
-    config_frame = ttk.Frame(mode_notebook)
-    mode_notebook.add(config_frame, text="By Config")
-
-    # Dropdown for selecting a service type
-    ttk.Label(config_frame, text="Select Service Type:").pack(anchor="w", padx=10, pady=5)
-    service_type_menu = ttk.Combobox(config_frame, textvariable=selected_service_type, state="readonly", width=40)
-    service_type_menu['values'] = ['decode', 'transcode', 'descramble']
-    service_type_menu.pack(padx=10, pady=5)
-
-    # Function to filter files based on service type
-    def load_config_files():
-        if not selected_service_type.get():
-            messagebox.showwarning("Selection Error", "Please select a service type.")
-            return
+        #file dropper
+        self.selector = FileSelector(config_frame)  # Change to the desired directory path
+        self.selector.pack(padx=20, pady=20)
+        self.service_dir = self.selector.selected_file_path
         
-        # Define path based on selected service type
-        service_type = selected_service_type.get()
-        service_dir = Path("./payloads/" + service_type)
-        if not service_dir.exists():
-            messagebox.showwarning("Directory Error", f"No directory found for {service_type}.")
-            dropdown_menu['values'] = []
-            return
+        # Button to start the configuration process
+        begin_button = tk.Button(tool_tab, text="Begin Config", command=self.begin_config, bg="green", fg="black")
+        begin_button.pack(side=tk.BOTTOM, expand=True, pady=10, padx=10, anchor="e")
 
-        # Get JSON files from the selected service directory
-        files = [file.name for file in service_dir.iterdir() if file.is_file() and file.suffix == '.json']
-        dropdown_menu['values'] = files
-        if files:
-            selected_file.set(files[0])  # Set default selection
-        else:
-            dropdown_menu['values'] = []
+        # Create and pack the Status Panel on the right side
+        self.status_panel = StatusPanel(tool_tab, ports=48, width=tool_tab.winfo_screenwidth(), height=100)
+        self.status_panel.pack(pady=20)
 
-    # Dropdown for selecting a config file
-    ttk.Label(config_frame, text="Select Config File:").pack(anchor="w", padx=10, pady=5)
-    dropdown_menu = ttk.Combobox(config_frame, textvariable=selected_file, state="readonly", width=40)
-    dropdown_menu.pack(padx=10, pady=5)
+        # Console output display
+        console_output = tk.Text(tool_tab, height=40, wrap="word", state="disabled")
+        console_output.pack(fill="x", padx=10, pady=5)
 
-    # Load files when service type changes
-    service_type_menu.bind("<<ComboboxSelected>>", lambda e: load_config_files())
+        # Redirect stdout and sderr to the Text widget
+        sys.stdout = RedirectedOutput(console_output)
+        sys.stderr = RedirectedOutput(console_output)
 
-    #file dropper
-    dropper = FileDropper(config_frame)
-    dropper.pack(side="right", padx=50)
+    def validate_config_file(self, selected_file):
+        if selected_file is None:
+            print("No file has been selected")
+            return False  # Nothing selected
 
-    # # --- Inventory Tab ---
-    # # inventory_frame = ttk.Frame(mode_notebook)
-    # # mode_notebook.add(inventory_frame, text="By Inventory")
+        if not selected_file.endswith('.json'):
+            print("Selected file is not of type json")
+            return False  # File is not a JSON file
+        
+        try:
+            with open(selected_file, 'r') as f:
+                data = json.load(f)
+            
+            # Check for 'processing.processingType'
+            processing_section = data.get("processing", {})
+            processing_type = processing_section.get("processingType", "").strip()  # Ensure it's a string
 
-    # # Inventory file upload button and label to show the loaded file
-    # def upload_inventory_file():
-    #     file_path = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")])
-    #     if file_path:
-    #         inventory_file_loaded.set(f"Loaded file: {Path(file_path).name}")
-    #         # Optionally, copy or move the file to a specific location for processing
+            print(f"[DEBUG] Processing type read from JSON: '{processing_type}'")
 
-    # upload_button = tk.Button(inventory_frame, text="Upload Inventory File", command=upload_inventory_file, bg="blue", fg="black")
-    # upload_button.pack(pady=10, padx=10)
+            if not processing_type:
+                print("Missing 'processingType' field in JSON.")
+                return False
 
-    # # Display loaded inventory file name
-    # inventory_label = ttk.Label(inventory_frame, textvariable=inventory_file_loaded, foreground="green")
-    # inventory_label.pack(pady=5, padx=10)
+            # Define valid processing types
+            valid_keywords = {"Decode", "Transcode", "Descramble"}
 
-    # ip_range_selector = IPRangeSelector(config_frame)
+            # Find which valid keyword is in processingType
+            matched_keyword = next((keyword for keyword in valid_keywords if keyword in processing_type), None)
+
+            if not matched_keyword:
+                print(f"Invalid processingType: '{processing_type}'. Expected to contain one of {valid_keywords}.")
+                return False
+
+            # Save the matched keyword
+            self.processing_type = matched_keyword  
+            print(f"[INFO] Matched processingType: '{self.processing_type}'")
+
+            return True  # Valid processingType
+
+        except (json.JSONDecodeError, FileNotFoundError) as e:
+            # If there's an error loading the JSON, return False
+            return False
 
     # Run config based on selected IP range or inventory file
-    def begin_config():
-        def background():
-            # Validate that both the service type and config file are selected
-            if not selected_service_type.get():
-                print("Please select a service type.")
-                return
-            if not selected_file.get():
-                print("Please select a config file.")
-                return
-        
-            if mode_notebook.index("current") == 0:  # Config mode
-
-                # Define path based on selected service type
-                service_type = selected_service_type.get()
-                service_dir = Path("./payloads/" + service_type + "/" + selected_file.get())
-
-                send_payload_all(service_type, service_dir)
-
-
-            elif mode_notebook.index("current") == 1:  # Inventory mode
-                if not inventory_file_loaded.get().startswith("Loaded file"):
-                    messagebox.showwarning("Input Error", "Please upload an inventory file.")
-                    return
-                messagebox.showinfo("Starting Config", f"Configuring based on {inventory_file_loaded.get()}.")
-
-        # Run the process in a separate thread
-        threading.Thread(target=background, daemon=True).start()
-
-    # Button to start the configuration process
-    begin_button = tk.Button(tool_tab, text="Begin Config", command=begin_config, bg="green", fg="black")
-    begin_button.pack(side=tk.BOTTOM, expand=True, pady=10, padx=10, anchor="e")
-
-    # Create and pack the Status Panel on the right side
-    status_panel = StatusPanel(tool_tab, ports=48, width=tool_tab.winfo_screenwidth(), height=100)
-    status_panel.pack(pady=20)
-
-    # Console output display
-    console_output = tk.Text(tool_tab, height=40, wrap="word", state="disabled")
-    console_output.pack(fill="x", padx=10, pady=5)
-
-    # Redirect stdout and sderr to the Text widget
-    sys.stdout = RedirectedOutput(console_output)
-    sys.stderr = RedirectedOutput(console_output)
-
-    def send_payload_all(request_type, payload):
-        print()
-        print("INITIATING PAYLOAD PROCESS")
-
-        #Get all operational ports to configure
-        print("Getting operational ports")
-        update_all_ports(switch_ip, 1)
-        ports = get_active_ports(switch_ip)
-        print("ACTIVE PORTS: ")
-        print(ports)
-
-        # turn off all ports except management
-        print("Turning off all ports")
-        update_all_ports(switch_ip, 2)
-        status_panel.update_all_circle_color(status='disconnected')
-        # print(get_all_port_status(switch_ip))
-
-        # send payload for each port
-        for port in ports:
-            status_panel.update_circle_color(port, 'processing')
-            print()
-
-            # (port - 1) because the first port is number 2. this is done for readability
-            print(f"===================MEG CONFIG ON PORT {(int(port) - 1)}========================")
-            print(f"Turning port {port} on")
-            set_port(switch_ip, port, 1)      # Turn port on
-
-            sleep(6)                  # wait for meg to be reachable
-
-            if is_ip_reachable(base_meg_ip):
-                print("Meg is reachable. Continuing with payload")
-            else:
-                print("Meg is not reachable. Skipping this port")
-                status_panel.update_circle_color(port, status='failed')
-                continue
-
-            # Get auth for this meg
-            print("Getting authorization to meg")
-            if post_auth(base_meg_ip) == 'error':
-                status_panel.update_circle_color(port, 'failed')
-                continue
+    def begin_config(self):
+            def background():
+                print(self.selector.selected_file_path)
+                self.payload = self.selector.selected_file_path
+                # Validate that both the service type and config file are selected
+                if not self.validate_config_file(self.selector.selected_file_path):
+                    print("Validation failed. Please check the required fields.")
+                    return  # Stop further execution of begin_config if validation failsvalidate_config_file(selector.selected_file_path)
             
-            # make post request to meg
-            if process_service_for_ip(request_type, base_meg_ip, payload) == 'error':
-                status_panel.update_circle_color(port, 'failed')
-                continue
+                if self.mode_notebook.index("current") == 0:  # Config mode
 
-            # Turn port off
-            set_port(switch_ip, port, 2)  
+                    # # Define path based on selected service type
+                    # service_type = selected_service_type.get()
+                    # service_dir = Path("./payloads/" + service_type + "/" + selected_file.get())
 
-            # set status to green    
-            status_panel.update_circle_color(port, status='success')  
-        update_all_ports(switch_ip, 1)
-        print()
-        print("==============================================")
-        print("PAYLOAD PROCESS COMPLETE")
+                    self.send_payload_all()
 
 
-    return tool_tab
+                elif self.mode_notebook.index("current") == 1:  # Inventory mode
+                    if not self.inventory_file_loaded.get().startswith("Loaded file"):
+                        messagebox.showwarning("Input Error", "Please upload an inventory file.")
+                        return
+                    messagebox.showinfo("Starting Config", f"Configuring based on {self.inventory_file_loaded.get()}.")
+
+            # Run the process in a separate thread
+            threading.Thread(target=background, daemon=True).start()
+
+    def send_payload_all(self):
+            print()
+            print("INITIATING PAYLOAD PROCESS")
+
+            #Get all operational ports to configure
+            print("Getting operational ports")
+            update_all_ports(switch_ip, 1)
+            ports = get_active_ports(switch_ip)
+            print("ACTIVE PORTS: ")
+            print(ports)
+
+            # turn off all ports except management
+            print("Turning off all ports")
+            update_all_ports(switch_ip, 2)
+            self.status_panel.update_all_circle_color(status='disconnected')
+            # print(get_all_port_status(switch_ip))
+
+            # send payload for each port
+            for port in ports:
+                self.status_panel.update_circle_color(port, 'processing')
+                print()
+
+                # (port - 1) because the first port is number 2. this is done for readability
+                print(f"===================MEG CONFIG ON PORT {(int(port) - 1)}========================")
+                print(f"Turning port {port} on")
+                set_port(switch_ip, port, 1)      # Turn port on
+
+                sleep(6)                  # wait for meg to be reachable
+
+                if is_ip_reachable(base_meg_ip):
+                    print("Meg is reachable. Continuing with payload")
+                else:
+                    print("Meg is not reachable. Skipping this port")
+                    self.status_panel.update_circle_color(port, status='failed')
+                    continue
+
+                # Get auth for this meg
+                print("Getting authorization to meg")
+                if post_auth(base_meg_ip) == 'error':
+                    self.status_panel.update_circle_color(port, 'failed')
+                    continue
+                
+                # make post request to meg
+                if process_service_for_ip(self.processing_type, base_meg_ip, self.payload) == 'error':
+                    self.status_panel.update_circle_color(port, 'failed')
+                    continue
+
+                # Turn port off
+                set_port(switch_ip, port, 2)  
+
+                # set status to green    
+                self.status_panel.update_circle_color(port, status='success')  
+            update_all_ports(switch_ip, 1)
+            print()
+            print("==============================================")
+            print("PAYLOAD PROCESS COMPLETE")
