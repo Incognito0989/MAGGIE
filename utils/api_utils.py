@@ -4,6 +4,22 @@ from settings import *
 
 TOKEN = None
 
+def post(url, payload):
+  headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': TOKEN
+  }
+
+  with open(payload, "r") as file:
+    payload = json.load(file)
+
+  response = requests.request("POST", url, headers=headers, json=payload, verify=False)
+  print(response.text)
+
+  if 'errors' in response.text:
+    return 'error'
+
 def process_service_for_ip(service_type, ip, service_dir):
     service_functions = {
         "decode": post_decode_service,
@@ -63,8 +79,12 @@ def post_decode_service(base_ip, payload):
 
 # TODO
 def post_descramble_service(base_ip, payload):
-   print(f"Posting descramble service to {base_ip} with payload: {payload}")
+  print(f"Posting descramble service to {base_ip} with payload: {payload}")
+  url = f"https://{base_ip}:8443/api/v2/Descrambling?results=false"
+  post(url, payload)
 
 # TODO
 def post_transcode_service(base_ip, payload):
    print(f"Posting transcode service to {base_ip} with payload: {payload}")
+   url = f"https://{base_ip}:8443/api/v2/TranscodeServices?results=false"
+   post(url, payload)
