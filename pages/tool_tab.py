@@ -8,6 +8,7 @@ import ipaddress, sys
 
 import paramiko
 from components.file_dropper import FileDropper
+from components.configurator import ConfigPanel
 from components.file_selector import FileSelector
 from components.status_panel import StatusPanel
 from utils.api_utils import *
@@ -36,9 +37,6 @@ class RedirectedOutput:
 
 class ToolTab:
     def __init__(self, notebook, services_dir):
-        self.config_thread = None  # Store the thread reference
-        self.stop_event = threading.Event()  # Event to signal stopping
-        
         self.notebook = notebook
         self.service_dir = services_dir
         self.processing_type = None
@@ -55,6 +53,12 @@ class ToolTab:
         # --- Config Tab ---
         config_frame = ttk.Frame(self.mode_notebook)
         self.mode_notebook.add(config_frame, text="By Config File")
+
+        # --- Gen Tab ---
+        gen_frame = ttk.Frame(self.mode_notebook)
+        # self.mode_notebook.add(gen_frame, text="Setting Generator")
+        self.config_panel = ConfigPanel(gen_frame)
+        self.config_panel.pack(padx=10, pady=10)
 
         #file dropper
         self.selector = FileSelector(config_frame)  # Change to the desired directory path
@@ -119,19 +123,35 @@ class ToolTab:
         except (json.JSONDecodeError, FileNotFoundError) as e:
             # If there's an error loading the JSON, return False
             return False
-
+            
     # Run config based on selected IP range or inventory file
     def begin_config(self):
         def background():
-            if self.mode_notebook.index("current") == 0:  # Config mode
-                print(self.selector.selected_file_path)
-                self.payload = self.selector.selected_file_path
-                # Validate that both the service type and config file are selected
-                if not self.validate_config_file(self.selector.selected_file_path):
-                    print("Validation failed. Please check the required fields.")
-                    return  # Stop further execution of begin_config if validation failsvalidate_config_file(selector.selected_file_path)
+            try:
+                print("Configuration process started...")
+                
+                if self.mode_notebook.index("current") == 0:  # Config mode
+                    print(self.selector.selected_file_path)
+                    self.payload = self.selector.selected_file_path
+                    
+                    if not self.validate_config_file(self.selector.selected_file_path):
+                        print("Validation failed. Stopping process.")
+                        return  # Stop execution if validation fails
 
-                self.send_payload_all()
+                    self.send_payload_all()
+
+                elif self.mode_notebook.index("current") == 1:  # Generator mode
+                    if self.config_panel.fill_json_template():
+                        self.payload = self.config_panel.get_payload()
+                        self.processing_type = self.config_panel.get_processing_type()
+                        print(f"Processing Type: {self.processing_type}")
+                        print(f"Payload: \n {self.payload}")
+
+                print("Configuration process completed.")
+            except Exception as e:
+                print(f"Error: {e}")
+            finally:
+                print("... Process Done ...")
 
         # Run the process in a separate thread
         self.config_thread = threading.Thread(target=background, daemon=True)
@@ -157,6 +177,10 @@ class ToolTab:
 
             # send payload for each port
             for port in ports:
+                # Check stop_event before proceeding
+                if self.stop_event.is_set():
+                    print("Configuration canceled.")
+                    return
                 self.status_panel.update_circle_color(port, 'processing')
                 print()
 
@@ -173,18 +197,18 @@ class ToolTab:
                     set_port(switch_ip, port, 2)  
                     continue
 
-                # # Get auth for this meg
-                # print("Getting authorization to meg")
-                # if post_auth(meg_ip) == 'error':
-                #     self.status_panel.update_circle_color(port, 'failed')
-                #     set_port(switch_ip, port, 2)  
-                #     continue
+                # Get auth for this meg
+                print("Getting authorization to meg")
+                if post_auth(meg_ip) == 'error':
+                    self.status_panel.update_circle_color(port, 'failed')
+                    set_port(switch_ip, port, 2)  
+                    continue
                 
-                # # make post request to meg
-                # if process_service_for_ip(self.processing_type, base_meg_ip, self.payload) == 'error':
-                #     self.status_panel.update_circle_color(port, 'failed')
-                #     set_port(switch_ip, port, 2)  
-                #     continue
+                # make post request to meg
+                if process_service_for_ip(self.processing_type, base_meg_ip, self.payload) == 'error':
+                    self.status_panel.update_circle_color(port, 'failed')
+                    set_port(switch_ip, port, 2)  
+                    continue
 
                 # Turn port off
                 set_port(switch_ip, port, 2)  
