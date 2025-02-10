@@ -37,8 +37,8 @@ def post_auth(base_ip):
     url = f"https://{base_ip}:8443/api/authenticate"
 
     payload = {
-      "login": rest_login,
-      "password": rest_password
+      "login": meg_login,
+      "password": meg_password
     }
     headers = {
       'Content-Type': 'application/json',
