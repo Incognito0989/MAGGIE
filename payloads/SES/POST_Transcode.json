@@ -1,0 +1,311 @@
+{
+    "name": "TEST",
+    "inputService": {
+      "id": "0001fffb-0000-0003-0000-00010000000f"
+    },
+    "processing": {
+      "processingType": "SD_Transcode",
+      "videoSettings": {
+        "processingMode": "Transcode",
+        "codec": "H.264",
+        "rateMode": "CBR",
+        "esRate": 4000,
+        "decode": {
+          "tracktype": "StreamType",
+          "streamType": "MPEG2",
+          "sourcePid": null,
+          "componentTag": null,
+          "MCTF_Mode": "Disabled",
+          "preDeblockingFilter": "Disabled",
+          "freezeFrameDetection": "Disabled",
+          "topLineBlanking": 0,
+          "horizontalSharpness": 12,
+          "verticalSharpness": 18,
+          "IT_Detection": "Disabled",
+          "videoInputLossMode": "BlackFrames",
+          "closedCaptionSourceMode": "Auto",
+          "latencyTolerance": "Low",
+          "afdArSourceMode": "Auto",
+          "arSourceSelection": "16:9",
+          "afdSourceSelection": "16:9_ShootAndProtect_4:3",
+          "detailEnhancement": "Disabled"
+        },
+        "encode": {
+          "profile": "Main",
+          "resolutionMode": "FollowInput",
+          "scaling": "320",
+          "scanType": "progressive",
+          "hResolution": "352",
+          "vResolution": "480",
+          "frameRate": "29.97",
+          "frameFieldEncoding": "MBAFF",
+          "gopMode": "Custom",
+          "gopSize": 15,
+          "maxGopSize": 22,
+          "gopBPictures": 2,
+          "gopHierarchical": "Off",
+          "idrInsertion": 0,
+          "captionServiceDescr": {
+            "csdMode": "Auto",
+            "captionServices": []
+          },
+          "svqMode": "Disabled",
+          "vqOptimization": "Subjective",
+          "afdArOutputMode": "Auto",
+          "afdArOutputAr": "4:3",
+          "watermarking": {
+            "seiMode": "Disabled",
+            "seiPayload": null,
+            "seiPayloadLength": null
+          },
+          "cpbDelayMode": "Auto",
+          "maxCpbDelay": null,
+          "dynamicRange": "Auto",
+          "deblockingFilterMode": "Static",
+          "alphaTcOffset": 0,
+          "betaOffset": 0,
+          "highDensity": false,
+          "QC_VBR_Target": null,
+          "vqmMode": "Disabled",
+          "fileOutput": null,
+          "monitoringWindow": null,
+          "PSNRAlarmThreshold": null,
+          "pVMAFAlarmThreshold": null,
+          "hdrAdvancedSettings": {
+            "dolbyVisionProfile": null,
+            "dolbyVisionLevel11Enabled": null,
+            "dolbyVisionContentType": null,
+            "dolbyVisionIntendedWhitePoint": null,
+            "CLLI_Enabled": null,
+            "CLLI_MaxFALL": null,
+            "CLLI_MaxCLL": null,
+            "masteringDisplayLuminanceEnabled": null,
+            "masteringDisplayLuminanceMin": null,
+            "masteringDisplayLuminanceMax": null
+          },
+          "closedCaptionOutput": "CEA-708"
+        },
+        "vqConfigMode": null,
+        "svqQualityLevel": null,
+        "URC_Statmux": {
+          "defaultRate": null
+        }
+      },
+      "serviceSettings": {
+        "userName": "TEST",
+        "useInSDTa": false,
+        "adaptSITables": "Auto",
+        "maxBitrateDescrMode": "GenerateForES",
+        "maxBitrateDescrValue": null,
+        "PCR_Interval": 37,
+        "PCR_LocationMode": "FollowInput",
+        "processingDelay": 5000,
+        "serviceLossTriggers": {
+          "triggers": [
+            "VideoInputLoss",
+            "AudioInputLoss",
+            "FormatMismatch",
+            "ProcessingError"
+          ]
+        }
+      },
+      "audioSettings": [
+        {
+          "audioId": "Audio#1",
+          "decode": {
+            "tracktype": "Pid",
+            "streamType": null,
+            "language": "",
+            "sourcePid": 2002,
+            "componentTag": null,
+            "decodeFormat": "Auto",
+            "channelConfig": "Auto",
+            "inputLossMode": "NoBitrate",
+            "nielsen": {
+              "enable": false,
+              "targetPid": null
+            }
+          },
+          "profiles": [
+            {
+              "profileId": "AudioProfile#1",
+              "targetPid": null,
+              "codec": "MPEG-L2",
+              "bitrate": 192,
+              "lipSync": 0,
+              "outputChannelConfig": "Stereo",
+              "outputSampleRate": "48",
+              "aligned": false,
+              "framesPerPES": "1",
+              "modifyAudioDescriptor": false,
+              "outputLanguage": null,
+              "audioOutputType": null,
+              "addUnrefPCR": false,
+              "xcodeMode": "Transcode"
+            }
+          ],
+          "audioProcType": "Encode"
+        }
+      ]
+    },
+    "outputs": [
+      {
+        "outputService": {
+          "outputTS": {
+            "outputType": "XGRESS",
+            "interface": "Data1",
+            "targetIp": "host_name",
+            "targetUdp": 4800,
+            "name": "",
+            "TSID": 1,
+            "ONID": 1,
+            "tags": [],
+            "sourceIPAddress": "Interface",
+            "sourceUdp": 8111,
+            "rateMode": "CBR",
+            "rate": 6000000,
+            "outputProtocol": "RTP",
+            "tableStandard": "DVB",
+            "streaming": "On",
+            "generateSyncUUID": true,
+            "syncUUID": "80000000-0000-c0a8-0100-c10200000001",
+            "TOS": 0,
+            "TTL": 64,
+            "UdpSize": 7,
+            "tsScrambling": {
+              "scramblingAction": "Scrambling",
+              "mode": "DvbScrambling",
+              "algorithm": "CSA",
+              "initializationVector": "00000000000000000000000000000000",
+              "forceScramblingBits": false,
+              "sparVariant": 0,
+              "controlWordSync": "Disabled_for_CW",
+              "clearStrongPairingEnforcement": false,
+              "sessionWordConfigured": false,
+              "parity": null,
+              "operatingMode": "Simulcrypt",
+              "cwGenerationMode": "Conformance",
+              "packetsNotScrambled": "None",
+              "scrambledPercentage": 100,
+              "nullStuffingPackets": "Scrambled",
+              "scramblingDescriptor": "Disabled",
+              "allowEcmRemapping": true
+            },
+            "probeTS": {
+              "targetIp": "",
+              "targetUdp": 0,
+              "sourceIPAddress": null,
+              "streaming": null
+            },
+            "URC_DataPidMeasurements": {
+              "mode": null,
+              "type": [],
+              "host": null,
+              "udpPort": null,
+              "poolName": null,
+              "minBandwidthRequestInterval": null
+            },
+            "alarmSettings": {
+              "payloadBitrateTooLow": {
+                "enable": false,
+                "threshold": 36000000,
+                "triggerForTsOutputLoss": true
+              },
+              "stuffingRateTooLow": {
+                "enable": false,
+                "threshold": 1000000,
+                "triggerForTsOutputLoss": true
+              },
+              "serviceLoss": {
+                "triggerForTsOutputLossForServiceLoss": "AnyOneService"
+              },
+              "serviceNotScrambled": {
+                "triggerForTsOutputLoss": true
+              }
+            },
+            "channelId": "",
+            "componentSharing": "ShareAlways",
+            "autoPassRules": {
+              "tsAutoPass": {
+                "removeAutoPassedOnRuleRemoval": false,
+                "removeServiceIfNotPresentInPAT": false,
+                "tsAutoPassRules": []
+              },
+              "serviceAutoPass": {
+                "passESs": true,
+                "passECMs": true,
+                "passES_ECMs": true
+              }
+            },
+            "vlan": {
+              "vlanId": null
+            },
+            "tsFEC": {
+              "triggerMode": "Disabled",
+              "sendingArrangement": "BlockAligned",
+              "columnFEC": {
+                "targetIp": null,
+                "targetUdp": null
+              },
+              "rowFEC": {
+                "targetIp": null,
+                "targetUdp": null
+              },
+              "D_ColDepth": 6,
+              "L_RowLength": 10
+            },
+            "rip": {
+              "enable": false,
+              "normalMetric": 1,
+              "alarmMetric": 16,
+              "routeTag": 0
+            },
+            "targetIpOverrule": null,
+            "srtSettings": null,
+            "zixiSettings": null,
+            "rtmpSettings": null,
+            "ristSettings": null,
+            "depiSettings": null,
+            "httpSettings": null
+          },
+          "name": "Program 1",
+          "forceName": false,
+          "forceSID": false,
+          "sid": 1,
+          "streaming": "On",
+          "pids": [],
+          "alternatePCR": {
+            "enable": false,
+            "noInput": null,
+            "sourceId": null,
+            "sourceUrl": null,
+            "pcrPid": null
+          },
+          "scrambling": {
+            "mode": "Disabled",
+            "scrambleOnlyAV": false,
+            "blockCaInfo": false,
+            "sessionWordConfigured": true,
+            "powerKeySession": {
+              "sessionID": null,
+              "isEncrypted": null,
+              "ecmDelivered": null,
+              "iskAvailable": null,
+              "pkEcmAvailable": null,
+              "scpEcmAvailable": null
+            }
+          },
+          "serviceBackup": {
+            "serviceBackupMode": "NonRevertive",
+            "delayMainToBackup": 0,
+            "delayBackupToMain": 10
+          }
+        },
+        "mergedComponents": [],
+        "trackRules": []
+      }
+    ],
+    "targetIp": null,
+    "targetUdp": null,
+    "vlanId": null
+  }

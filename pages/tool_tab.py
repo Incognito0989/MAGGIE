@@ -5,6 +5,8 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
 import ipaddress, sys
+
+import paramiko
 from components.file_dropper import FileDropper
 from components.file_selector import FileSelector
 from components.status_panel import StatusPanel
@@ -34,6 +36,9 @@ class RedirectedOutput:
 
 class ToolTab:
     def __init__(self, notebook, services_dir):
+        self.config_thread = None  # Store the thread reference
+        self.stop_event = threading.Event()  # Event to signal stopping
+        
         self.notebook = notebook
         self.service_dir = services_dir
         self.processing_type = None
@@ -43,13 +48,13 @@ class ToolTab:
         tool_tab = ttk.Frame(self.notebook)
         self.notebook.add(tool_tab, text="Tool")
 
-        # Mode selection (Config or Inventory)
+        # Mode selection (Config or Generator)
         self.mode_notebook = ttk.Notebook(tool_tab)
         self.mode_notebook.pack(fill=tk.BOTH, expand=False, padx=10, pady=10)
 
         # --- Config Tab ---
         config_frame = ttk.Frame(self.mode_notebook)
-        self.mode_notebook.add(config_frame, text="By Config")
+        self.mode_notebook.add(config_frame, text="By Config File")
 
         #file dropper
         self.selector = FileSelector(config_frame)  # Change to the desired directory path
@@ -57,8 +62,8 @@ class ToolTab:
         self.service_dir = self.selector.selected_file_path
         
         # Button to start the configuration process
-        begin_button = tk.Button(tool_tab, text="Begin Config", command=self.begin_config, bg="green", fg="black")
-        begin_button.pack(side=tk.BOTTOM, expand=True, pady=10, padx=10, anchor="e")
+        self.begin_button = tk.Button(tool_tab, text="Begin Config", command=self.begin_config, bg="green", fg="black")
+        self.begin_button.pack(side=tk.BOTTOM, expand=True, pady=10, padx=10, anchor="e")
 
         # Create and pack the Status Panel on the right side
         self.status_panel = StatusPanel(tool_tab, ports=48, width=tool_tab.winfo_screenwidth(), height=100)
@@ -117,31 +122,20 @@ class ToolTab:
 
     # Run config based on selected IP range or inventory file
     def begin_config(self):
-            def background():
+        def background():
+            if self.mode_notebook.index("current") == 0:  # Config mode
                 print(self.selector.selected_file_path)
                 self.payload = self.selector.selected_file_path
                 # Validate that both the service type and config file are selected
                 if not self.validate_config_file(self.selector.selected_file_path):
                     print("Validation failed. Please check the required fields.")
                     return  # Stop further execution of begin_config if validation failsvalidate_config_file(selector.selected_file_path)
-            
-                if self.mode_notebook.index("current") == 0:  # Config mode
 
-                    # # Define path based on selected service type
-                    # service_type = selected_service_type.get()
-                    # service_dir = Path("./payloads/" + service_type + "/" + selected_file.get())
+                self.send_payload_all()
 
-                    self.send_payload_all()
-
-
-                elif self.mode_notebook.index("current") == 1:  # Inventory mode
-                    if not self.inventory_file_loaded.get().startswith("Loaded file"):
-                        messagebox.showwarning("Input Error", "Please upload an inventory file.")
-                        return
-                    messagebox.showinfo("Starting Config", f"Configuring based on {self.inventory_file_loaded.get()}.")
-
-            # Run the process in a separate thread
-            threading.Thread(target=background, daemon=True).start()
+        # Run the process in a separate thread
+        self.config_thread = threading.Thread(target=background, daemon=True)
+        self.config_thread.start()     
 
     def send_payload_all(self):
             print()
@@ -150,6 +144,7 @@ class ToolTab:
             #Get all operational ports to configure
             print("Getting operational ports")
             update_all_ports(switch_ip, 1)
+            sleep(10)
             ports = get_active_ports(switch_ip)
             print("ACTIVE PORTS: ")
             print(ports)
@@ -167,28 +162,29 @@ class ToolTab:
 
                 # (port - 1) because the first port is number 2. this is done for readability
                 print(f"===================MEG CONFIG ON PORT {(int(port) - 1)}========================")
-                print(f"Turning port {port} on")
+                print(f"Turning port {int(port) - 1} on")
                 set_port(switch_ip, port, 1)      # Turn port on
 
-                sleep(6)                  # wait for meg to be reachable
-
-                if is_ip_reachable(base_meg_ip):
+                if is_ip_reachable(meg_ip, duration=60):
                     print("Meg is reachable. Continuing with payload")
                 else:
                     print("Meg is not reachable. Skipping this port")
                     self.status_panel.update_circle_color(port, status='failed')
+                    set_port(switch_ip, port, 2)  
                     continue
 
-                # Get auth for this meg
-                print("Getting authorization to meg")
-                if post_auth(base_meg_ip) == 'error':
-                    self.status_panel.update_circle_color(port, 'failed')
-                    continue
+                # # Get auth for this meg
+                # print("Getting authorization to meg")
+                # if post_auth(meg_ip) == 'error':
+                #     self.status_panel.update_circle_color(port, 'failed')
+                #     set_port(switch_ip, port, 2)  
+                #     continue
                 
-                # make post request to meg
-                if process_service_for_ip(self.processing_type, base_meg_ip, self.payload) == 'error':
-                    self.status_panel.update_circle_color(port, 'failed')
-                    continue
+                # # make post request to meg
+                # if process_service_for_ip(self.processing_type, base_meg_ip, self.payload) == 'error':
+                #     self.status_panel.update_circle_color(port, 'failed')
+                #     set_port(switch_ip, port, 2)  
+                #     continue
 
                 # Turn port off
                 set_port(switch_ip, port, 2)  

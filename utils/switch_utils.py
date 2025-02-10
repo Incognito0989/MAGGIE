@@ -1,4 +1,7 @@
 from pysnmp.hlapi import *
+from scapy.all import ARP, Ether, srp
+from netmiko import ConnectHandler
+
 
 # physical port is 47
 management_port = 48
@@ -466,9 +469,95 @@ def get_arp_table(switch_ip, community='public'):
     
     return arp_dict
 
+def arp_request(target_ip):
+    # Create an Ethernet frame with an ARP request
+    arp = ARP(pdst=target_ip)  # Target IP address for ARP request
+    ether = Ether(dst="ff:ff:ff:ff:ff:ff")  # Broadcast MAC address
+    packet = ether/arp  # Combine Ether and ARP packets
+    
+    # Send the packet and receive the response (timeout 2 seconds)
+    result = srp(packet, timeout=2, verbose=False)[0]  # Send and receive
+    
+    if result:
+        for sent, received in result:
+            print(f"IP: {received.psrc} - MAC: {received.hwsrc}")
+    else:
+        print(f"No response from IP {target_ip}")
 
 
+def clear_arp_cache(host, username, password, enable):
+    """Clears the ARP cache on a Cisco switch using SSH."""
+    switch = {
+        "device_type": "cisco_ios",
+        "host": host,
+        "username": username,
+        "password": password,
+        "secret": enable
+    }
 
+    try:
+        # Connect to the switch
+        conn = ConnectHandler(**switch)
+        conn.enable()
+
+        # Send the command to clear ARP cache
+        output = conn.send_command("clear arp-cache")
+        conn.disconnect()
+
+        return output  # Return the command output
+
+    except Exception as e:
+        return f"Error: {e}"
+
+from netmiko import ConnectHandler
+
+def get_arp_table(host, username, password, enable_password):
+    """Retrieves the ARP table from a Cisco switch."""
+    switch = {
+        "device_type": "cisco_ios",
+        "host": host,
+        "username": username,
+        "password": password,
+        "secret": enable_password  # 'secret' for the enable password
+    }
+
+    try:
+        # Connect to the switch
+        conn = ConnectHandler(**switch)
+
+        # Enter privileged EXEC mode using the enable password
+        conn.enable()
+
+        # Send the command to get the ARP table
+        output = conn.send_command("show ip arp")
+
+        # Disconnect after the operation
+        conn.disconnect()
+
+        # Return the output (ARP table)
+        return output
+
+    except Exception as e:
+        return f"Error: {e}"
+
+# # Example usage
+# host = "10.4.11.240"  # Replace with your switch's IP
+# username = "netadmin"  # Replace with your username
+# password = "Syn@123!!"  # Replace with your SSH login password
+# enable_password = "Syna1234"  # Replace with your enable password
+
+# arp_table = get_arp_table(host, username, password, enable_password)
+# print(arp_table)
+
+
+# # # Example usage
+# # target_ip = "10.4.11.68"  # Replace with the target IP you want to perform ARP request for
+# # arp_request(target_ip)
+# result = clear_arp_cache(host="10.4.11.240", username="netadmin", password="Syn@123!!")
+# print(result)
+
+# arp_table = get_arp_table(host, username, password, enable_password)
+# print(arp_table)
 
 
 # Example usage
@@ -492,5 +581,8 @@ switch_ip = '10.4.11.240'
 # ports = get_all_port_status(switch_ip)
 # for entry in ports:
 #     print(entry)
-# set_port(switch_ip, 14, 1)
+# # clear_arp_cache(host="10.4.11.240", username="netadmin", password="Syn@123!!")
+# set_port(switch_ip, 18, 2)  #72 #68
+# set_port(switch_ip, 2, 2)   #64
+# set_port(switch_ip, 34, 1)  #68
 # print(is_port_operational(switch_ip, 14))

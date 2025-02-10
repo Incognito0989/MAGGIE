@@ -1,0 +1,159 @@
+{
+    "name": "CHANNEL_NAME",
+    "descrambling": null,
+    "inputService": {
+      "id": "0001fffb-0000-0003-0000-00010000000f"
+    },
+    "processing": {
+      "processingType": "Decode",
+      "serviceSettings": {
+        "userName": "CHANNEL_NAME",
+        "serviceLossTriggers": {
+          "triggers": [
+            "VideoInputLoss",
+            "AudioInputLoss",
+            "FormatMismatch",
+            "ProcessingError"
+          ]
+        }
+      },
+      "videoSettings": {
+        "processingMode": "Decode",
+        "decodeSource": {
+          "tracktype": "StreamType",
+          "sourcePid": null,
+          "streamType": "MPEG2",
+          "componentTag": null,
+          "freezeFrameDetection": "Disabled",
+          "freezeFrameThreshold": null,
+          "topLineBlanking": 0,
+          "horizontalSharpness": 12,
+          "verticalSharpness": 18,
+          "IT_Detection": "Disabled",
+          "croppingSettings": {
+            "mode": "Disabled",
+            "topOffset": null,
+            "bottomOffset": null,
+            "leftOffset": null,
+            "rightOffset": null
+          },
+          "videoInputLoss": "BlackFrames"
+        },
+        "decodes": [
+          {
+            "decodeName": "VideoProfile#1",
+            "format": "SD",
+            "resolutionMode": "FollowInput",
+            "hResolution": "720",
+            "vResolution": "480",
+            "frameRate": "29.97",
+            "afdArOutputMode": null,
+            "afdArOutputAr": null,
+            "afdArSourceMode": null,
+            "arSourceSelection": null,
+            "afdSourceSelection": null,
+            "detailEnhancement": "Disabled"
+          }
+        ]
+      },
+      "audioSettings": [
+        {
+          "audioId": "Audio#1",
+          "decode": {
+            "tracktype": "Pid",
+            "sourcePid": 2002,
+            "streamType": null,
+            "componentTag": null,
+            "language": "",
+            "decodeFormat": "Auto",
+            "channelConfig": "Auto"
+          },
+          "PCM_Outputs": [
+            {
+              "profileId": "Audio#1",
+              "xcodeMode": "DecodeToPCM",
+              "outputChannelConfig": "Stereo",
+              "outputSampleRate": "48"
+            }
+          ]
+        }
+      ]
+    },
+    "outputs": [
+      {
+        "interface": "SDI2",
+        "outputType": "SDI",
+        "userName": null,
+        "streaming": null,
+        "channelId": null,
+        "nmosUUID": null,
+        "sdiSettings": {
+          "sdiComponents": [
+            {
+              "type": "Video",
+              "userName": "Video",
+              "videoSettings": {
+                "videoDecodeName": "VideoProfile#1",
+                "closedCaptions": {
+                  "format": "CEA-708",
+                  "field1LineOffset": 5
+                },
+                "afd": {
+                  "enable": true,
+                  "field1LineOffset": 4
+                },
+                "scte104": [
+                  {
+                    "enable": false,
+                    "scte35Pid": null,
+                    "field1LineOffset": 6
+                  }
+                ],
+                "sourceVbiPids": [],
+                "st-2031": {
+                  "enable": true,
+                  "field1LineOffset": 7
+                },
+                "sdp_op47": {
+                  "enable": true,
+                  "field1LineOffset": 8
+                },
+                "mdp_op47": {
+                  "enable": true,
+                  "field1LineOffset": 9
+                },
+                "vitc": {
+                  "mode": "Passthrough"
+                },
+                "wss": {
+                  "mode": "Passthrough"
+                },
+                "analogVbiSettings": {
+                  "teletext": null,
+                  "vitc": null,
+                  "wss": null,
+                  "closedCaptions": null
+                }
+              }
+            },
+            {
+              "type": "Audio",
+              "userName": "Audio#1",
+              "audioSettings": {
+                "audioSlotSettings": [
+                  {
+                    "audioDecodeName": "Audio#1",
+                    "LR_Packet": 0,
+                    "LR_Pair": 0
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "sdi20226Settings": null,
+        "sdi2110Settings": null,
+        "hdmiSettings": null
+      }
+    ]
+  }
