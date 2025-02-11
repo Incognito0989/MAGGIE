@@ -13,3 +13,5 @@ pysnmp==5.1.0
 pysnmpcrypto==0.0.4
 requests==2.32.3
 urllib3==2.2.3
+scapy==2.6.1
+netmiko==4.5.0
