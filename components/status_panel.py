@@ -31,7 +31,8 @@ class StatusPanel(tk.Frame):
         "failed": {'bg_color': 'red', 'txt_color': 'white'},
         "mgmt": {'bg_color': 'yellow', 'txt_color': 'black'},
         "connected": {'bg_color': 'lightblue', 'txt_color': 'black'},
-        "disconnected": {'bg_color': 'lightgrey', 'txt_color': 'black'},
+        "disconnected": {'bg_color': 'darkgrey', 'txt_color': 'white'},
+        "active_disconnected": {'bg_color': 'lightgrey', 'txt_color': 'black'},
         "processing": {'bg_color': 'blue', 'txt_color': 'white'}
     }
 

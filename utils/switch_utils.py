@@ -1,12 +1,7 @@
 from pysnmp.hlapi import *
 from scapy.all import ARP, Ether, srp
 from netmiko import ConnectHandler
-
-
-# physical port is 47
-management_port = 48
-
-
+from settings import *
 
 #in progress helper function
 def get_admin_status(switch_ip, port_index, community):
@@ -311,8 +306,7 @@ def get_port_list(switch_ip):
     list: A list of dictionaries with port index ie. ['2', '3', '4', '5']
     """
     ports = get_all_physical_ports(switch_ip)
-    return [item[0] for item in ports if not is_management(item[0])]
-
+    return [item[0] for item in ports if not is_management(item[0]) and int(item[0]) not in map(int, port_exclusions)]
 
 
 ### UPDATE PORT FUNCTIONS
@@ -345,6 +339,12 @@ def set_port(switch_ip, port_index, status=1, community='private'):
         print(f"Error on port {port_index}: {errorStatus.prettyPrint()}")
     # else:
     #     print(f"Successfully set port {port_index} status to {status}")
+
+def update_ports(ports, status, tooltab):
+    for port in ports:
+        print(f"Turning off port {int(port) - 1}")
+        set_port(switch_ip, port, status)
+        tooltab.status_panel.update_circle_color(port, status='active_disconnected')
 
 def update_all_ports(switch_ip, status=1, community='private'):
     """
@@ -583,6 +583,7 @@ switch_ip = '10.4.11.240'
 #     print(entry)
 # # clear_arp_cache(host="10.4.11.240", username="netadmin", password="Syn@123!!")
 # set_port(switch_ip, 18, 2)  #72 #68
-# set_port(switch_ip, 2, 2)   #64
-# set_port(switch_ip, 34, 1)  #68
+set_port(switch_ip, 2, 1)   #64
+set_port(switch_ip, 34, 2)  #68
 # print(is_port_operational(switch_ip, 14))
+# print(get_port_list(switch_ip))

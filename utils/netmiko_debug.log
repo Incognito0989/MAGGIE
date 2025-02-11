@@ -1,0 +1,21 @@
+Last login: Tue Feb 11 12:56:44 2025 from 10.5.197.119
+
+[root@localhost ~]# 
+
+[root@localhost ~]# 
+
+[root@localhost ~]# meg-configure user --remove maggie
+
+[0;31mERROR: Cannot remove non-existent user 'maggie'.
+[root@localhost ~]# meg-configure user --add maggie --ignore-passphrase-policy  --passphrase maggie --gui-admin --rest-user
+
+User 'maggie' with roles 'rest-user, gui-admin' has been created.
+
+Grafana user 'maggie' with role 'Admin' has been created.
+[root@localhost ~]# 
+
+[root@localhost ~]# 
+
+[root@localhost ~]# exit
+
+logout
