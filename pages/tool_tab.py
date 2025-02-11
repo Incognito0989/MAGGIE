@@ -4,16 +4,15 @@ from time import sleep
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
-import ipaddress, sys
+import sys
 
-import paramiko
 from components.file_dropper import FileDropper
 from components.configurator import ConfigPanel
 from components.file_selector import FileSelector
 from components.status_panel import StatusPanel
-from utils.api_utils import *
 from components.ip_range_selector import IPRangeSelector
 from utils.ip_utils import *
+from utils.meg_utils import MegManager
 from utils.switch_utils import *
 from settings import *
 
@@ -169,52 +168,57 @@ class ToolTab:
             print("ACTIVE PORTS: ")
             print(ports)
 
-            # turn off all ports except management
-            print("Turning off all ports")
-            update_all_ports(switch_ip, 2)
+            # turn off all ports except management and exceptions and non active
+            print("Turning off all active ports")
+            update_ports(ports, 2, self)
+            
             self.status_panel.update_all_circle_color(status='disconnected')
-            # print(get_all_port_status(switch_ip))
 
             # send payload for each port
             for port in ports:
-                # Check stop_event before proceeding
-                if self.stop_event.is_set():
-                    print("Configuration canceled.")
-                    return
-                self.status_panel.update_circle_color(port, 'processing')
-                print()
+                try:
+                    print(self.payload)
+                    meg = MegManager(payload=self.payload, processing_type=self.processing_type, service_dir=self.service_dir)
+                    print(meg.payload)
+                    self.status_panel.update_circle_color(port, 'processing')
+                    print()
 
-                # (port - 1) because the first port is number 2. this is done for readability
-                print(f"===================MEG CONFIG ON PORT {(int(port) - 1)}========================")
-                print(f"Turning port {int(port) - 1} on")
-                set_port(switch_ip, port, 1)      # Turn port on
+                    # (port - 1) because the first port is number 2. this is done for readability
+                    print(f"===================MEG CONFIG ON PORT {(int(port) - 1)}========================")
+                    print(f"Turning port {int(port) - 1} on")
+                    set_port(switch_ip, port, 1)      # Turn port on
 
-                if is_ip_reachable(meg_ip, duration=60):
+                    # Raise an error if MEG is unreachable
+                    if not meg.is_ip_reachable(duration=60):
+                        raise Exception("Meg is not reachable")
+
                     print("Meg is reachable. Continuing with payload")
-                else:
-                    print("Meg is not reachable. Skipping this port")
+
+                    meg.prechecks()
+
+                    # Get auth for this MEG
+                    print("Getting authorization to meg...")
+                    if meg.post_auth() == 'error':
+                        raise Exception("Authorization failed")
+
+                    # Make post request to MEG
+                    print("Making post request...")
+                    if meg.process_service_for_ip() == 'error':
+                        raise Exception("Service post failed")
+
+                    # Turn port off
+                    set_port(switch_ip, port, 2)  
+
+                    # set status to green    
+                    self.status_panel.update_circle_color(port, status='success')
+
+                except Exception as e:
+                    print(f"Error on port {int(port) - 1}: {e}")
                     self.status_panel.update_circle_color(port, status='failed')
-                    set_port(switch_ip, port, 2)  
-                    continue
 
-                # Get auth for this meg
-                print("Getting authorization to meg")
-                if post_auth(meg_ip) == 'error':
-                    self.status_panel.update_circle_color(port, 'failed')
-                    set_port(switch_ip, port, 2)  
-                    continue
-                
-                # make post request to meg
-                if process_service_for_ip(self.processing_type, base_meg_ip, self.payload) == 'error':
-                    self.status_panel.update_circle_color(port, 'failed')
-                    set_port(switch_ip, port, 2)  
-                    continue
+                finally:
+                    set_port(switch_ip, port, 2)  # Turn port off
 
-                # Turn port off
-                set_port(switch_ip, port, 2)  
-
-                # set status to green    
-                self.status_panel.update_circle_color(port, status='success')  
             update_all_ports(switch_ip, 1)
             print()
             print("==============================================")
