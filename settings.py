@@ -11,5 +11,5 @@ meg_password="$ynamedia"
 meg_rest_username="maggie"
 meg_rest_password="maggie"
 
-port_exclusions = [18, management_port]
+port_exclusions = [18, 34, management_port]
 ## port range that is being used is  2 ... 49

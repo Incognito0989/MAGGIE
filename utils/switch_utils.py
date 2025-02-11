@@ -583,7 +583,7 @@ switch_ip = '10.4.11.240'
 #     print(entry)
 # # clear_arp_cache(host="10.4.11.240", username="netadmin", password="Syn@123!!")
 # set_port(switch_ip, 18, 2)  #72 #68
-set_port(switch_ip, 2, 1)   #64
-set_port(switch_ip, 34, 2)  #68
+# set_port(switch_ip, 2, 1)   #64
+# set_port(switch_ip, 34, 2)  #68
 # print(is_port_operational(switch_ip, 14))
 # print(get_port_list(switch_ip))

@@ -128,6 +128,9 @@ class MegManager:
             'Authorization': self.TOKEN
         }
 
+        print('...HEADERS...')
+        print(headers)
+
         with open(self.payload, "r") as file:
             self.payload = json.load(file)
 
@@ -148,7 +151,7 @@ class MegManager:
     # TODO
     def post_transcode_service(self):
         print(f"Posting transcode service to {self.ip} with payload: {self.file_name}")
-        url = f"https://{self.ip}:8443/api/v2/TranscodeServices?results=false"
+        url = f"https://{self.ip}:8443/api/v2/LinearTranscodeServices?results=false"
         self.post(url)
 
     def force_arp_update(self):
