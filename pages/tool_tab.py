@@ -122,9 +122,11 @@ class ToolTab:
         except (json.JSONDecodeError, FileNotFoundError) as e:
             # If there's an error loading the JSON, return False
             return False
-            
+
     # Run config based on selected IP range or inventory file
     def begin_config(self):
+        #disable begin button
+        self.begin_button.config(state=tk.DISABLED, bg='red')
         def background():
             try:
                 print("Configuration process started...")
@@ -150,6 +152,7 @@ class ToolTab:
             except Exception as e:
                 print(f"Error: {e}")
             finally:
+                self.begin_button.config(state=tk.NORMAL, bg='green')
                 print("... Process Done ...")
 
         # Run the process in a separate thread
