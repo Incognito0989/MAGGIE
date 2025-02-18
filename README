@@ -1,0 +1,27 @@
+# Setup Guide
+
+## Clone repository
+1) git clone https://github.com/Incognito0989/MAGGIE.git
+
+## Install python
+
+1) install python 3.12 onto server from python page
+2) install pip from download page
+3) tkinter may need to be separately installed
+
+## Create/Activate python environment
+1) go to MAGGIE directory
+2) python3 -m venv venv
+3) source venv/bin/activate
+
+## Install dependencies
+1) pip install -r requirements.txt
+
+## Create desktop shortcut
+1) move maggie.desktop to ~/Desktop directory
+2) NOTE that directory of shorcut may need to be modified using vi to point to the tool
+
+## Configure settings
+1) settings.py can be configured with text editor or vim
+   - configure the necessary settings to comply with the workflow
+

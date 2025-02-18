@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=MAGGIE
+Comment=Run the GUI script with the virtual environment
+Exec=bash -c 'cd /home/atlanta/MAGGIE && source venv/bin/activate && python3 gui.py'
+Icon=/home/atlanta/MAGGIE/assets/Maggie_Simpson.png
+Terminal=true
+Type=Application
+Categories=Utility;
