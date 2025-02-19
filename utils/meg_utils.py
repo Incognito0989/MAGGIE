@@ -25,15 +25,45 @@ class MegManager:
         self.device = {
             "device_type": "linux",
             "host": self.ip,
-            "username": self.username,
-            "password": self.password,
+            "username": "root",
+            "password": "password",
             "session_log": "netmiko_debug.log",  # Logs session for debugging
         }
 
     def prechecks(self):
+        self.initial_login()
         self.confirm_rest_service()
         self.make_rest_user()
 
+    def initial_login(self):
+        try:
+            with ConnectHandler(**self.device) as net_connect:
+                # Send current password again when prompted
+                net_connect.write_channel("password\n")
+                net_connect.read_until_pattern(r"[Pp]assword:", timeout=5)
+
+                # Send new password
+                net_connect.write_channel(f"{self.password}\n")
+                net_connect.read_until_pattern(r"[Pp]assword:", timeout=5)
+
+                # Confirm new password
+                net_connect.write_channel(f"{self.password}\n")
+
+                print("Password changed successfully!")
+
+                self.device = {
+                    "device_type": "linux",
+                    "host": self.ip,
+                    "username": self.username,
+                    "password": self.password,
+                    "session_log": "netmiko_debug.log",  # Logs session for debugging
+                }
+    
+                return True
+        except Exception as e:
+            print(f"Login failed: {e}")
+            return False
+        
     def confirm_rest_service(self):
         try:
             print(f"Connecting to device: {self.ip}")
