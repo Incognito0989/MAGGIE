@@ -32,60 +32,108 @@ class MegManager:
         }
 
     def prechecks(self):
-        self.initial_login()
+        self.change_expired_password()
+        self.reset_password_ssh()
         self.confirm_rest_service()
         self.make_rest_user()
 
-    def initial_login(self):
+    def change_expired_password(self):
+        """Handle forced password change over SSH using pexpect and show terminal output."""
+
+        ssh_command = f"ssh {self.device["username"]}@{self.device["host"]}"
+
+        # Start the SSH session
+        child = pexpect.spawn(ssh_command, encoding='utf-8')
+
+        # Enable logging to stdout (prints all interactions)
+        # child.logfile = sys.stdout  # Show output in the terminal
+        print("Starting SSH session...")
+
         try:
-            print("Establish SSH connection to meg via plink using pexpect")
+            child.expect('password: ', timeout=15)
+            print("Password prompt received.")
+            child.sendline(self.device["password"])
+            print(f"Sent password: {self.device["password"]}")
 
-            # Define your connection variables
-            host = "10.4.11.240"
-            username = "root"
-            old_password = "oldpassword"  # Replace with the old password
-            new_password = "newpassword"  # Replace with the new password
+            # Handle forced password change prompt
+            child.expect("You are required to change your password immediately", timeout=15)
+            print("Password change required...")
 
-            # Start the plink session
-            child = pexpect.spawn(f"plink {self.device["username"]}@{self.device["host"]}")
+            child.expect('password: ', timeout=15)
+            print("Password prompt received again for confirmation.")
+            child.sendline(self.device["password"])
+            print(f"Sent current password again: {self.device["password"]}")
 
-            # Handle the "Are you sure you want to continue connecting?" prompt
-            child.expect("Are you sure you want to continue connecting (yes/no)?")
-            child.sendline("yes")
+            # See what response comes next
+            child.expect(['New password: ', 'The password fails the dictionary check', pexpect.TIMEOUT], timeout=30)
+            print(f"Received response: {child.after}")  # Print the exact response
 
-            # Handle the password prompt
-            child.expect("password:")
+            if 'The password fails the dictionary check' in child.after:
+                print("Password failed dictionary check, retyping...")
+                child.sendline(self.password)
+
+            # Send new password
+            child.expect('New password: ', timeout=30)
+            print("New password prompt received.")
+            child.sendline(self.password)
+            print(f"Sent new password: {self.password}")
+
+            # Wait for the retype password prompt and send again
+            child.expect('Retype new password: ', timeout=30)
+            print("Retype new password prompt received.")
+            child.sendline(self.password)
+            print(f"Retyped new password: {self.password}")
+
+        except pexpect.exceptions.TIMEOUT:
+            print(f"Timeout occurred. Last received output: {child.before}")  # Show last received text before timeout
+            child.close()
+            return
+
+        # Wait for success message
+        child.expect(['successfully', pexpect.TIMEOUT], timeout=30)
+        print(f"Final response: {child.after}")  # Print final confirmation or timeout
+
+        child.close()
+
+
+    def reset_password_ssh(self):
+        """Log in again with temp password and reset to original password."""
+        ssh_command = f"ssh {self.device["username"]}@{self.device["host"]}"
+
+        child = pexpect.spawn(ssh_command, encoding='utf-8')
+        # child.logfile = sys.stdout  # Print interactions
+
+        try:
+            child.expect('password: ', timeout=15)
+            print("Logging in again to reset password.")
+            child.sendline(self.password)
+
+            # Run passwd command
+            child.expect(f'{self.device["username"]}@', timeout=15)
+            child.sendline('passwd')
+
+            # Expect password prompts
+            child.expect('New password: ', timeout=15)
+            child.sendline(self.device["password"])
+            child.expect('Retype new password: ', timeout=15)
             child.sendline(self.device["password"])
 
-            # Handle the password change prompts
-            child.expect("New password:")
-            child.sendline(meg_password)
+            # Confirm success
+            child.expect(['password updated successfully', pexpect.TIMEOUT], timeout=15)
+            print(f"Password reset response: {child.after}")
 
-            child.expect("Retype new password:")
-            child.sendline(meg_password)
+        except pexpect.exceptions.TIMEOUT:
+            print(f"Timeout occurred while resetting password. Last output: {child.before}")
 
-            # Wait for the shell prompt after success
-            child.expect(r'\$')
-
-            # Exit the session
-            child.sendline("exit")
-            child.close()
-
-            print("Password changed successfully!")
-            # Update credentials for future logins
-            self.device["password"] = meg_password
-            return True
-
-        except pexpect.exceptions.ExceptionPexpect as e:
-            print(f"Error changing password: {e}")
-            return False
+        child.close()
+        print("Password reset completed.")
 
 
-
-        
     def confirm_rest_service(self):
         try:
+            print("Confirm rest service running")
             print(f"Connecting to device: {self.ip}")
+            print(self.device)
             with ConnectHandler(**self.device) as ssh:
                 print("Connected successfully!")
 
@@ -99,6 +147,7 @@ class MegManager:
 
     def make_rest_user(self):
         try:
+            print("Create rest user")
             print(f"Connecting to device: {self.ip}")
             print(self.device)
             with ConnectHandler(**self.device) as ssh:
