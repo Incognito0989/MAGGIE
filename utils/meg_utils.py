@@ -1,5 +1,5 @@
 from netmiko import ConnectHandler
-from settings import *
+# from settings import *
 import re
 import requests
 import json
@@ -7,10 +7,26 @@ import time
 import ipaddress
 import subprocess
 import platform
-from utils.switch_utils import *
+# from utils.switch_utils import *
 from netmiko import ConnectHandler
 import os
 import pexpect
+
+## GLOBAL VARIABLES
+management_port = 49            #this is physical port 48
+switch_ip = "10.4.11.240"
+switch_username = "netadmin"  # Replace with your username
+switch_password = "Syn@123!!"  # Replace with your SSH login password
+switch_enable_password = "Syna1234"  # Replace with your enable password
+
+meg_ip = "192.168.2.20"
+meg_username="root"
+meg_password="$ynamedia"
+meg_rest_username="maggie"
+meg_rest_password="maggie"
+
+port_exclusions = [management_port]
+## port range that is being used is  2 ... 49
 class MegManager:
     def __init__(self, payload, processing_type, service_dir):
         self.TOKEN = None
@@ -300,3 +316,7 @@ class MegManager:
                 time.sleep(1)  # Wait before retrying
         
         return False  # Timeout reached without success
+    
+meg = MegManager("/Users/ajones/Documents/Synamedia/git/MAGGIE/Templates/Decode_DEMO.json", None, None)
+meg.post_auth()
+meg.post_decode_service()
