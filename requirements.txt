@@ -14,4 +14,5 @@ pysnmpcrypto==0.0.4
 requests==2.32.3
 urllib3==2.2.3
 scapy==2.6.1
+pexpect==4.9.0
 netmiko==4.5.0

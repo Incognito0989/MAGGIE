@@ -17,7 +17,7 @@ class StatusPanel(tk.Frame):
         self.height = height
         self.ports = ports
         self.circle_colors = circle_colors or [self.port_status["disconnected"]] * ports
-        self.circle_colors[management_port - 1] = self.port_status["mgmt"]
+        self.circle_colors[management_port - 2] = self.port_status["mgmt"]
         self.circle_objects = []
 
         # Create canvas to draw the panel
@@ -89,7 +89,7 @@ class StatusPanel(tk.Frame):
         :param color: New color for all circles
         """
         self.circle_colors = [self.port_status[status]] * self.ports
-        self.circle_colors[management_port - 1] = self.port_status["mgmt"]
+        self.circle_colors[management_port - 2] = self.port_status["mgmt"]
         self.draw_status_panel()
 
     def draw_circle(self, port, x, y, circle_size):

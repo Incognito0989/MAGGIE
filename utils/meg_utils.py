@@ -10,6 +10,7 @@ import platform
 from utils.switch_utils import *
 from netmiko import ConnectHandler
 import os
+import pexpect
 class MegManager:
     def __init__(self, payload, processing_type, service_dir):
         self.TOKEN = None
@@ -37,32 +38,50 @@ class MegManager:
 
     def initial_login(self):
         try:
-            with ConnectHandler(**self.device) as net_connect:
-                # Send current password again when prompted
-                net_connect.write_channel("password\n")
-                net_connect.read_until_pattern(r"[Pp]assword:", timeout=5)
+            print("Establish SSH connection to meg via plink using pexpect")
 
-                # Send new password
-                net_connect.write_channel(f"{self.password}\n")
-                net_connect.read_until_pattern(r"[Pp]assword:", timeout=5)
+            # Define your connection variables
+            host = "10.4.11.240"
+            username = "root"
+            old_password = "oldpassword"  # Replace with the old password
+            new_password = "newpassword"  # Replace with the new password
 
-                # Confirm new password
-                net_connect.write_channel(f"{self.password}\n")
+            # Start the plink session
+            child = pexpect.spawn(f"plink {self.device["username"]}@{self.device["host"]}")
 
-                print("Password changed successfully!")
+            # Handle the "Are you sure you want to continue connecting?" prompt
+            child.expect("Are you sure you want to continue connecting (yes/no)?")
+            child.sendline("yes")
 
-                self.device = {
-                    "device_type": "linux",
-                    "host": self.ip,
-                    "username": self.username,
-                    "password": self.password,
-                    "session_log": "netmiko_debug.log",  # Logs session for debugging
-                }
-    
-                return True
-        except Exception as e:
-            print(f"Login failed: {e}")
+            # Handle the password prompt
+            child.expect("password:")
+            child.sendline(self.device["password"])
+
+            # Handle the password change prompts
+            child.expect("New password:")
+            child.sendline(meg_password)
+
+            child.expect("Retype new password:")
+            child.sendline(meg_password)
+
+            # Wait for the shell prompt after success
+            child.expect(r'\$')
+
+            # Exit the session
+            child.sendline("exit")
+            child.close()
+
+            print("Password changed successfully!")
+            # Update credentials for future logins
+            self.device["password"] = meg_password
+            return True
+
+        except pexpect.exceptions.ExceptionPexpect as e:
+            print(f"Error changing password: {e}")
             return False
+
+
+
         
     def confirm_rest_service(self):
         try:
