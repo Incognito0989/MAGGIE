@@ -1,5 +1,5 @@
 from netmiko import ConnectHandler
-# from settings import *
+from settings import *
 import re
 import requests
 import json
@@ -7,26 +7,26 @@ import time
 import ipaddress
 import subprocess
 import platform
-# from utils.switch_utils import *
+from utils.switch_utils import *
 from netmiko import ConnectHandler
 import os
 import pexpect
 
-## GLOBAL VARIABLES
-management_port = 49            #this is physical port 48
-switch_ip = "10.4.11.240"
-switch_username = "netadmin"  # Replace with your username
-switch_password = "Syn@123!!"  # Replace with your SSH login password
-switch_enable_password = "Syna1234"  # Replace with your enable password
+# ## GLOBAL VARIABLES
+# management_port = 49            #this is physical port 48
+# switch_ip = "10.4.11.240"
+# switch_username = "netadmin"  # Replace with your username
+# switch_password = "Syn@123!!"  # Replace with your SSH login password
+# switch_enable_password = "Syna1234"  # Replace with your enable password
 
-meg_ip = "192.168.2.20"
-meg_username="root"
-meg_password="$ynamedia"
-meg_rest_username="maggie"
-meg_rest_password="maggie"
+# meg_ip = "192.168.2.20"
+# meg_username="root"
+# meg_password="$ynamedia"
+# meg_rest_username="maggie"
+# meg_rest_password="maggie"
 
-port_exclusions = [management_port]
-## port range that is being used is  2 ... 49
+# port_exclusions = [management_port]
+# ## port range that is being used is  2 ... 49
 class MegManager:
     def __init__(self, payload, processing_type, service_dir):
         self.TOKEN = None
@@ -49,38 +49,8 @@ class MegManager:
 
     def prechecks(self):
         self.change_expired_password()
-        self.ssh_copy_id()
-        self.reset_password_ssh()
         self.confirm_rest_service()
         self.make_rest_user()
-
-    def ssh_copy_id(self):
-        """Automates ssh-copy-id using pexpect."""
-        
-        command = f"ssh-copy-id {self.device["username"]}@{self.device["host"]}"
-        child = pexpect.spawn(command, encoding="utf-8")
-
-        try:
-            # Expect password prompt
-            index = child.expect([
-                "password:",
-                "already exist",
-                pexpect.TIMEOUT
-            ], timeout=15)
-
-            if index == 0:
-                print("Password prompt received, sending password...")
-                child.sendline(self.device["password"])
-                child.expect(pexpect.EOF)
-                print("SSH key copied successfully!")
-
-            elif index == 1:
-                print("Key already exists on the server.")
-
-        except pexpect.TIMEOUT:
-            print("Timeout occurred while copying SSH key.")
-
-        child.close()
 
     def change_expired_password(self):
         """Handle forced password change over SSH using pexpect and show terminal output."""
@@ -140,6 +110,23 @@ class MegManager:
             print("Retype new password prompt received.")
             child.sendline(self.password)
             print(f"Retyped new password: {self.password}")
+
+            # Send pub id to authkeys
+            print("Adding Maggie's public key")
+            child.expect(']#')
+            child.sendline(f'echo "{pub_key}" >> ~/.ssh/authorized_keys')
+
+            child.expect(']#')
+            child.sendline('passwd')
+
+            # Expect password prompts
+            child.expect('New password: ', timeout=15)
+            child.sendline(self.device["password"])
+            child.expect('Retype new password: ', timeout=15)
+            child.sendline(self.device["password"])
+
+            # Confirm success
+            child.expect(['password updated successfully', pexpect.TIMEOUT], timeout=15)
 
         except pexpect.exceptions.TIMEOUT:
             print(f"Timeout occurred. Last received output: {child.before}")  # Show last received text before timeout
@@ -358,8 +345,8 @@ class MegManager:
         
         return False  # Timeout reached without success
     
-meg = MegManager("/Users/ajones/Documents/Synamedia/git/MAGGIE/Templates/Decode_DEMO.json", None, None)
-meg.prechecks()
-# meg.confirm_rest_service()
-meg.post_auth()
-meg.post_decode_service()
+# meg = MegManager("/Users/ajones/Documents/Synamedia/git/MAGGIE/Templates/Decode_DEMO.json", None, None)
+# meg.prechecks()
+# # meg.confirm_rest_service()
+# meg.post_auth()
+# meg.post_decode_service()
