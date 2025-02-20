@@ -49,9 +49,38 @@ class MegManager:
 
     def prechecks(self):
         self.change_expired_password()
+        self.ssh_copy_id()
         self.reset_password_ssh()
         self.confirm_rest_service()
         self.make_rest_user()
+
+    def ssh_copy_id(self):
+        """Automates ssh-copy-id using pexpect."""
+        
+        command = f"ssh-copy-id {self.device["username"]}@{self.device["host"]}"
+        child = pexpect.spawn(command, encoding="utf-8")
+
+        try:
+            # Expect password prompt
+            index = child.expect([
+                "password:",
+                "already exist",
+                pexpect.TIMEOUT
+            ], timeout=15)
+
+            if index == 0:
+                print("Password prompt received, sending password...")
+                child.sendline(self.device["password"])
+                child.expect(pexpect.EOF)
+                print("SSH key copied successfully!")
+
+            elif index == 1:
+                print("Key already exists on the server.")
+
+        except pexpect.TIMEOUT:
+            print("Timeout occurred while copying SSH key.")
+
+        child.close()
 
     def change_expired_password(self):
         """Handle forced password change over SSH using pexpect and show terminal output."""
@@ -66,7 +95,19 @@ class MegManager:
         print("Starting SSH session...")
 
         try:
-            child.expect('password: ', timeout=15)
+            # Handle SSH key verification prompt
+            index = child.expect([
+                'Are you sure you want to continue connecting (yes/no/[fingerprint])?',
+                'password: ',
+                pexpect.TIMEOUT
+            ], timeout=15)
+
+            if index == 0:
+                print("SSH key verification required, sending 'yes'...")
+                child.sendline("yes")
+                child.expect('password: ', timeout=15)
+                child.expect('')
+                child.expect('password: ', timeout=15)
             print("Password prompt received.")
             child.sendline(self.device["password"])
             print(f"Sent password: {self.device["password"]}")
@@ -318,5 +359,7 @@ class MegManager:
         return False  # Timeout reached without success
     
 meg = MegManager("/Users/ajones/Documents/Synamedia/git/MAGGIE/Templates/Decode_DEMO.json", None, None)
+meg.prechecks()
+# meg.confirm_rest_service()
 meg.post_auth()
 meg.post_decode_service()
