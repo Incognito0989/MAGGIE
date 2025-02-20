@@ -49,6 +49,7 @@ class MegManager:
 
     def prechecks(self):
         self.change_expired_password()
+        self.reset_password_ssh()
         self.confirm_rest_service()
         self.make_rest_user()
 
@@ -111,23 +112,6 @@ class MegManager:
             child.sendline(self.password)
             print(f"Retyped new password: {self.password}")
 
-            # Send pub id to authkeys
-            print("Adding Maggie's public key")
-            child.expect(']#')
-            child.sendline(f'echo "{pub_key}" >> ~/.ssh/authorized_keys')
-
-            child.expect(']#')
-            child.sendline('passwd')
-
-            # Expect password prompts
-            child.expect('New password: ', timeout=15)
-            child.sendline(self.device["password"])
-            child.expect('Retype new password: ', timeout=15)
-            child.sendline(self.device["password"])
-
-            # Confirm success
-            child.expect(['password updated successfully', pexpect.TIMEOUT], timeout=15)
-
         except pexpect.exceptions.TIMEOUT:
             print(f"Timeout occurred. Last received output: {child.before}")  # Show last received text before timeout
             child.close()
@@ -138,7 +122,6 @@ class MegManager:
         print(f"Final response: {child.after}")  # Print final confirmation or timeout
 
         child.close()
-
 
     def reset_password_ssh(self):
         """Log in again with temp password and reset to original password."""
@@ -151,6 +134,11 @@ class MegManager:
             child.expect('password: ', timeout=15)
             print("Logging in again to reset password.")
             child.sendline(self.password)
+
+            # Send pub id to authkeys
+            print("Adding Maggie's public key")
+            child.expect(']#')
+            child.sendline(f'echo "{pub_key}" >> ~/.ssh/authorized_keys')
 
             # Run passwd command
             child.expect(f'{self.device["username"]}@', timeout=15)
