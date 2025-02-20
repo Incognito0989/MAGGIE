@@ -160,6 +160,27 @@ class MegManager:
         child.close()
         print("Password reset completed.")
 
+    def cleanup(self):
+        try:
+            print("Cleaning up meg to fresh look")
+            print(f"Connecting to device: {self.ip}")
+            print(self.device)
+            with ConnectHandler(**self.device) as ssh:
+                print("Connected successfully!")
+
+                print("Removing all users")
+                output = ssh.send_command_timing("meg-configure user --remove-all-users")
+                print(output)
+
+                print("Restarting MEG service")
+                output = ssh.send_command_timing("meg-configure service --restart")
+                print(output)
+
+                print("Cleanup OS user/history and keys")
+                output = ssh.send_command_timing("shred -u /etc/ssh/*_key /etc/ssh/*_key.pub && shred -u /root/.ssh/authorized_keys && chage -d 0 root && history -c")
+
+        except Exception as e:
+            print(f"Error: {e}")
 
     def confirm_rest_service(self):
         try:
@@ -295,15 +316,15 @@ class MegManager:
         }
 
         try:
-            # Connect to the switch
+            print("Connect to the switch")
             net_connect = ConnectHandler(**device)
             
-            # Run ping command
+            print("Run ping command")
             output = net_connect.send_command(f"ping {self.ip}")
             
             print(output)  # Print the result
 
-            # Close connection
+            print("Close connection")
             net_connect.disconnect()
 
             print("Arp update complete")

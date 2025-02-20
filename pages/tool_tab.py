@@ -220,6 +220,7 @@ class ToolTab:
                     self.status_panel.update_circle_color(port, status='failed')
 
                 finally:
+                    meg.cleanup()
                     set_port(switch_ip, port, 2)  # Turn port off
 
             update_all_ports(switch_ip, 1)
