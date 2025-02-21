@@ -180,6 +180,52 @@ class MegManager:
         except Exception as e:
             print(f"Error: {e}")
 
+    def clean(self):
+        child = pexpect.spawn(self.ssh_command, encoding='utf-8')
+        try:
+            print("Connected!")
+            print("Cleaning up meg to fresh look")
+
+            print("Removing all users")
+            child.expect(']#')
+            child.sendline("meg-configure user --remove-all-users")
+
+            print("Restarting MEG service")
+            child.expect(']#')
+            child.sendline("meg-configure service --restart")
+
+            print("Cleanup OS user/history and keys")
+            child.expect(']#')
+            child.sendline("shred -u /root/.ssh/authorized_keys && chage -d 0 root && history -c")
+
+            print("Cleanup complete")
+
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def confirm_rest_access(self):
+        print("Confirming REST")
+        child = pexpect.spawn(self.ssh_command, encoding='utf-8')
+        try:
+            print("Connected")
+            print("Confirming rest service running")
+            child.expect(']#')
+            child.sendline('meg-configure service --enable-rest')
+            print("Rest enabled!")
+
+            print("Removing rest user")
+            child.expect(']#')
+            child.sendline(f"meg-configure user --remove {self.rest_username}")
+            print("Users removed")
+
+            print("Making rest user")
+            child.expect(']#')
+            child.sendline(f"meg-configure user --add {self.rest_username} --ignore-passphrase-policy  --passphrase {self.rest_password} --gui-admin --rest-user")
+            print(f"User {self.rest_username} created successfully!")
+
+        except Exception as e:
+            print(f"Error: {e}")
+
     def confirm_rest_service(self):
         try:
             print("Confirm rest service running")
