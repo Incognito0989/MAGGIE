@@ -203,7 +203,7 @@ class MegManager:
         except Exception as e:
             print(f"Error: {e}")
 
-    def confirm_rest_access(self):
+    def confirm_rest_access(self, attempt=0, retries=3, delay=5):
         print("Confirming REST")
         child = pexpect.spawn(self.ssh_command, encoding='utf-8')
         try:
@@ -225,8 +225,14 @@ class MegManager:
 
         except Exception as e:
             print(f"Error: {e}")
+            if attempt < retries:
+                print(f"Retrying in {delay} seconds...")
+                time.sleep(delay)  # Wait before retrying
+                self.confirm_rest_access(retries, delay, attempt + 1)  # Recursive call with incremented attempt
+            else:
+                print("Max retries reached. REST configuration failed.")
 
-    def confirm_rest_service(self):
+    def confirm_rest_service(self, attempt=0, retries=3, delay=5):
         try:
             print("Confirm rest service running")
             print(f"Connecting to device: {self.ip}")
@@ -241,8 +247,14 @@ class MegManager:
 
         except Exception as e:
             print(f"Error: {e}")
+            if attempt < retries:
+                print(f"Retrying in {delay} seconds...")
+                time.sleep(delay)  # Wait before retrying
+                self.confirm_rest_service(retries=retries, delay=delay, attempt=(attempt + 1))  # Recursive call with incremented attempt
+            else:
+                print("Max retries reached. REST service configuration failed.")
 
-    def make_rest_user(self):
+    def make_rest_user(self, attempt=0, retries=3, delay=5):
         try:
             print("Create rest user")
             print(f"Connecting to device: {self.ip}")
@@ -260,6 +272,12 @@ class MegManager:
 
         except Exception as e:
             print(f"Error: {e}")
+            if attempt < retries:
+                print(f"Retrying in {delay} seconds...")
+                time.sleep(delay)  # Wait before retrying
+                self.make_rest_user(retries=retries, delay=delay, attempt=(attempt + 1))  # Recursive call with incremented attempt
+            else:
+                print("Max retries reached. REST user configuration failed.")
 
     def post(self, url):
         headers = {
