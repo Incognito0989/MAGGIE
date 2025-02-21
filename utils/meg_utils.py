@@ -39,6 +39,7 @@ class MegManager:
         self.service_dir = service_dir
         self.payload = payload
         self.file_name = os.path.basename(self.payload)
+        self.ssh_command = f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR {self.device["username"]}@{self.device["host"]}"
         self.device = {
             "device_type": "linux",
             "host": self.ip,
@@ -56,10 +57,8 @@ class MegManager:
     def change_expired_password(self):
         """Handle forced password change over SSH using pexpect and show terminal output."""
 
-        ssh_command = f"ssh {self.device["username"]}@{self.device["host"]}"
-
         # Start the SSH session
-        child = pexpect.spawn(ssh_command, encoding='utf-8')
+        child = pexpect.spawn(self.ssh_command, encoding='utf-8')
 
         # Enable logging to stdout (prints all interactions)
         # child.logfile = sys.stdout  # Show output in the terminal
@@ -125,9 +124,8 @@ class MegManager:
 
     def reset_password_ssh(self):
         """Log in again with temp password and reset to original password."""
-        ssh_command = f"ssh {self.device["username"]}@{self.device["host"]}"
 
-        child = pexpect.spawn(ssh_command, encoding='utf-8')
+        child = pexpect.spawn(self.ssh_command, encoding='utf-8')
         # child.logfile = sys.stdout  # Print interactions
 
         try:
