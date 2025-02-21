@@ -175,7 +175,7 @@ class MegManager:
                 print(output)
 
                 print("Cleanup OS user/history and keys")
-                output = ssh.send_command_timing("shred -u /etc/ssh/*_key /etc/ssh/*_key.pub && shred -u /root/.ssh/authorized_keys && chage -d 0 root && history -c")
+                output = ssh.send_command_timing("shred -u /root/.ssh/authorized_keys && chage -d 0 root && history -c")
 
         except Exception as e:
             print(f"Error: {e}")
