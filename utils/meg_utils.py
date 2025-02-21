@@ -39,7 +39,6 @@ class MegManager:
         self.service_dir = service_dir
         self.payload = payload
         self.file_name = os.path.basename(self.payload)
-        self.ssh_command = f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR {self.device["username"]}@{self.device["host"]}"
         self.device = {
             "device_type": "linux",
             "host": self.ip,
@@ -47,6 +46,7 @@ class MegManager:
             "password": "password",
             "session_log": "netmiko_debug.log",  # Logs session for debugging
         }
+        self.ssh_command = f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR {self.device["username"]}@{self.device["host"]}"
 
     def prechecks(self):
         self.change_expired_password()
