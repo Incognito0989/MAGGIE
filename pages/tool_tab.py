@@ -15,24 +15,7 @@ from utils.ip_utils import *
 from utils.meg_utils import MegManager
 from utils.switch_utils import *
 from settings import *
-
-class RedirectedOutput:
-    def __init__(self, text_widget):
-        self.text_widget = text_widget
-
-    def write(self, message):
-        # Add a timestamp before each message
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Format timestamp as you wish
-        message_with_timestamp = f"[{timestamp}] {message}"
-
-        # Temporarily enable the text widget to insert text
-        self.text_widget.config(state=tk.NORMAL)
-        self.text_widget.insert(tk.END, message_with_timestamp)
-        self.text_widget.see(tk.END)  # Auto-scroll to the latest output
-        self.text_widget.config(state=tk.DISABLED)  # Disable it again to prevent editing
-        
-    def flush(self):  # To handle interactive environments
-        pass
+from components.log_viewer import LogViewer
 
 class ToolTab:
     def __init__(self, notebook, services_dir):
@@ -72,13 +55,9 @@ class ToolTab:
         self.status_panel = StatusPanel(tool_tab, ports=48, width=tool_tab.winfo_screenwidth(), height=100)
         self.status_panel.pack(pady=20)
 
-        # Console output display
-        console_output = tk.Text(tool_tab, height=40, wrap="word", state="disabled")
-        console_output.pack(fill="x", padx=10, pady=5)
-
-        # Redirect stdout and sderr to the Text widget
-        sys.stdout = RedirectedOutput(console_output)
-        sys.stderr = RedirectedOutput(console_output)
+        # Log Viewer Panel
+        self.log_viewer = LogViewer(tool_tab)
+        self.log_viewer.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
     def validate_config_file(self, selected_file):
         if selected_file is None:
@@ -209,6 +188,8 @@ class ToolTab:
                     if meg.process_service_for_ip() == 'error':
                         raise Exception("Service post failed")
 
+                    meg.cleanup()
+
                     # Turn port off
                     set_port(switch_ip, port, 2)  
 
@@ -220,7 +201,6 @@ class ToolTab:
                     self.status_panel.update_circle_color(port, status='failed')
 
                 finally:
-                    meg.cleanup()
                     set_port(switch_ip, port, 2)  # Turn port off
 
             update_all_ports(switch_ip, 1)
