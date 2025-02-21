@@ -561,7 +561,7 @@ def get_arp_table(host, username, password, enable_password):
 
 
 # Example usage
-switch_ip = '10.4.11.240'
+#switch_ip = '10.4.11.240'
 # community = 'public'
 
 # update_all_ports(switch_ip, 1)
