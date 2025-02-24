@@ -166,9 +166,9 @@ class MegManager:
             with ConnectHandler(**self.device) as ssh:
                 print("Connected successfully!")
 
-                print("Removing all users")
-                output = ssh.send_command_timing("meg-configure user --remove-all-users")
-                print(output)
+                # print("Removing all users")
+                # output = ssh.send_command_timing("meg-configure user --remove-all-users")
+                # print(output)
 
                 print("Restarting MEG service")
                 output = ssh.send_command_timing("meg-configure service --restart")
