@@ -15,3 +15,5 @@ port_exclusions = [management_port]
 ## port range that is being used is  2 ... 49
 
 pub_key = ""
+
+hardware_port = 5

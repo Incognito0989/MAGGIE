@@ -48,11 +48,18 @@ class MegManager:
         }
         self.ssh_command = f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR {self.device["username"]}@{self.device["host"]}"
 
-    def prechecks(self):
+
+    def configure(self):
+        self.is_ip_reachable(duration=60)
         self.change_expired_password()
         self.reset_password_ssh()
         self.confirm_rest_service()
         self.make_rest_user()
+        self.post_auth()
+        self.put_set_output_port()
+        self.process_service_for_ip()
+        self.cleanup()
+
 
     def change_expired_password(self):
         """Handle forced password change over SSH using pexpect and show terminal output."""
@@ -64,57 +71,57 @@ class MegManager:
         # child.logfile = sys.stdout  # Show output in the terminal
         print("Starting SSH session...")
 
-        try:
-            # Handle SSH key verification prompt
-            index = child.expect([
-                'Are you sure you want to continue connecting (yes/no/[fingerprint])?',
-                'password: ',
-                pexpect.TIMEOUT
-            ], timeout=15)
+        # try:
+        # Handle SSH key verification prompt
+        index = child.expect([
+            'Are you sure you want to continue connecting (yes/no/[fingerprint])?',
+            'password: ',
+            pexpect.TIMEOUT
+        ], timeout=15)
 
-            if index == 0:
-                print("SSH key verification required, sending 'yes'...")
-                child.sendline("yes")
-                child.expect('password: ', timeout=15)
-                child.expect('')
-                child.expect('password: ', timeout=15)
-            print("Password prompt received.")
-            child.sendline(self.device["password"])
-            print(f"Sent password: {self.device["password"]}")
-
-            # Handle forced password change prompt
-            child.expect("You are required to change your password immediately", timeout=15)
-            print("Password change required...")
-
+        if index == 0:
+            print("SSH key verification required, sending 'yes'...")
+            child.sendline("yes")
             child.expect('password: ', timeout=15)
-            print("Password prompt received again for confirmation.")
-            child.sendline(self.device["password"])
-            print(f"Sent current password again: {self.device["password"]}")
+            child.expect('')
+            child.expect('password: ', timeout=15)
+        print("Password prompt received.")
+        child.sendline(self.device["password"])
+        print(f"Sent password: {self.device["password"]}")
 
-            # See what response comes next
-            child.expect(['New password: ', 'The password fails the dictionary check', pexpect.TIMEOUT], timeout=30)
-            print(f"Received response: {child.after}")  # Print the exact response
+        # Handle forced password change prompt
+        child.expect("You are required to change your password immediately", timeout=15)
+        print("Password change required...")
 
-            if 'The password fails the dictionary check' in child.after:
-                print("Password failed dictionary check, retyping...")
-                child.sendline(self.password)
+        child.expect('password: ', timeout=15)
+        print("Password prompt received again for confirmation.")
+        child.sendline(self.device["password"])
+        print(f"Sent current password again: {self.device["password"]}")
 
-            # Send new password
-            child.expect('New password: ', timeout=30)
-            print("New password prompt received.")
+        # See what response comes next
+        child.expect(['New password: ', 'The password fails the dictionary check', pexpect.TIMEOUT], timeout=30)
+        print(f"Received response: {child.after}")  # Print the exact response
+
+        if 'The password fails the dictionary check' in child.after:
+            print("Password failed dictionary check, retyping...")
             child.sendline(self.password)
-            print(f"Sent new password: {self.password}")
 
-            # Wait for the retype password prompt and send again
-            child.expect('Retype new password: ', timeout=30)
-            print("Retype new password prompt received.")
-            child.sendline(self.password)
-            print(f"Retyped new password: {self.password}")
+        # Send new password
+        child.expect('New password: ', timeout=30)
+        print("New password prompt received.")
+        child.sendline(self.password)
+        print(f"Sent new password: {self.password}")
 
-        except pexpect.exceptions.TIMEOUT:
-            print(f"Timeout occurred. Last received output: {child.before}")  # Show last received text before timeout
-            child.close()
-            return
+        # Wait for the retype password prompt and send again
+        child.expect('Retype new password: ', timeout=30)
+        print("Retype new password prompt received.")
+        child.sendline(self.password)
+        print(f"Retyped new password: {self.password}")
+
+        # except pexpect.exceptions.TIMEOUT:
+        #     print(f"Timeout occurred. Last received output: {child.before}")  # Show last received text before timeout
+        #     child.close()
+        #     return
 
         # Wait for success message
         child.expect(['successfully', pexpect.TIMEOUT], timeout=30)
@@ -122,63 +129,66 @@ class MegManager:
 
         child.close()
 
+
     def reset_password_ssh(self):
         """Log in again with temp password and reset to original password."""
 
         child = pexpect.spawn(self.ssh_command, encoding='utf-8')
         # child.logfile = sys.stdout  # Print interactions
 
-        try:
-            child.expect('password: ', timeout=15)
-            print("Logging in again to reset password.")
-            child.sendline(self.password)
+        # try:
+        child.expect('password: ', timeout=15)
+        print("Logging in again to reset password.")
+        child.sendline(self.password)
 
-            # Send pub id to authkeys
-            print("Adding Maggie's public key")
-            child.expect(']#')
-            child.sendline(f'echo "{pub_key}" >> ~/.ssh/authorized_keys')
+        # Send pub id to authkeys
+        print("Adding Maggie's public key")
+        child.expect(']#')
+        child.sendline(f'echo "{pub_key}" >> ~/.ssh/authorized_keys')
 
-            # Run passwd command
-            child.expect(f'{self.device["username"]}@', timeout=15)
-            child.sendline('passwd')
+        # Run passwd command
+        child.expect(f'{self.device["username"]}@', timeout=15)
+        child.sendline('passwd')
 
-            # Expect password prompts
-            child.expect('New password: ', timeout=15)
-            child.sendline(self.device["password"])
-            child.expect('Retype new password: ', timeout=15)
-            child.sendline(self.device["password"])
+        # Expect password prompts
+        child.expect('New password: ', timeout=15)
+        child.sendline(self.device["password"])
+        child.expect('Retype new password: ', timeout=15)
+        child.sendline(self.device["password"])
 
-            # Confirm success
-            child.expect(['password updated successfully', pexpect.TIMEOUT], timeout=15)
-            print(f"Password reset response: {child.after}")
+        # Confirm success
+        child.expect(['password updated successfully', pexpect.TIMEOUT], timeout=15)
+        print(f"Password reset response: {child.after}")
 
-        except pexpect.exceptions.TIMEOUT:
-            print(f"Timeout occurred while resetting password. Last output: {child.before}")
+        # except pexpect.exceptions.TIMEOUT:
+        #     print(f"Timeout occurred while resetting password. Last output: {child.before}")
 
         child.close()
         print("Password reset completed.")
 
+
     def cleanup(self):
-        try:
-            print("Cleaning up meg to fresh look")
-            print(f"Connecting to device: {self.ip}")
-            print(self.device)
-            with ConnectHandler(**self.device) as ssh:
-                print("Connected successfully!")
+        # try:
+        print("Cleaning up meg to fresh look")
+        print(f"Connecting to device: {self.ip}")
+        print(self.device)
+        with ConnectHandler(**self.device) as ssh:
+            print("Connected successfully!")
 
-                # print("Removing all users")
-                # output = ssh.send_command_timing("meg-configure user --remove-all-users")
-                # print(output)
+            # print("Removing all users")
+            # output = ssh.send_command_timing("meg-configure user --remove-all-users")
+            # print(output)
 
-                print("Restarting MEG service")
-                output = ssh.send_command_timing("meg-configure service --restart")
-                print(output)
+            print("Restarting MEG service")
+            output = ssh.send_command_timing("meg-configure service --restart")
+            print(output)
 
-                print("Cleanup OS user/history and keys")
-                output = ssh.send_command_timing("shred -u /root/.ssh/authorized_keys && chage -d 0 root && history -c")
+            print("Cleanup OS user/history and keys")
+            output = ssh.send_command_timing("shred -u /root/.ssh/authorized_keys && chage -d 0 root && history -c")
 
-        except Exception as e:
-            print(f"Error: {e}")
+        # except Exception as e:
+        #     print(f"Error: {e}")
+
 
     def clean(self):
         child = pexpect.spawn(self.ssh_command, encoding='utf-8')
@@ -202,6 +212,7 @@ class MegManager:
 
         except Exception as e:
             print(f"Error: {e}")
+
 
     def confirm_rest_access(self, attempt=0, retries=3, delay=5):
         print("Confirming REST")
@@ -231,6 +242,8 @@ class MegManager:
                 self.confirm_rest_access(retries, delay, attempt + 1)  # Recursive call with incremented attempt
             else:
                 print("Max retries reached. REST configuration failed.")
+                raise RuntimeError("Max retries reached. REST configuration failed.")
+
 
     def confirm_rest_service(self, attempt=0, retries=3, delay=5):
         try:
@@ -253,6 +266,8 @@ class MegManager:
                 self.confirm_rest_service(retries=retries, delay=delay, attempt=(attempt + 1))  # Recursive call with incremented attempt
             else:
                 print("Max retries reached. REST service configuration failed.")
+                raise RuntimeError("Max retries reached. REST service configuration failed.")
+
 
     def make_rest_user(self, attempt=0, retries=3, delay=5):
         try:
@@ -278,6 +293,8 @@ class MegManager:
                 self.make_rest_user(retries=retries, delay=delay, attempt=(attempt + 1))  # Recursive call with incremented attempt
             else:
                 print("Max retries reached. REST user configuration failed.")
+                raise RuntimeError("Max retries reached. REST user configuration failed.")
+
 
     def post(self, url):
         headers = {
@@ -286,14 +303,27 @@ class MegManager:
             'Authorization': self.TOKEN
         }
 
+        # try:
         with open(self.payload, "r") as file:
             self.payload = json.load(file)
 
-        response = requests.request("POST", url, headers=headers, json=self.payload, verify=False)
+        response = requests.post(url, headers=headers, json=self.payload, verify=False)
+        response.raise_for_status()  # Raises an error for 4xx/5xx responses
+
         print(response.text)
 
-        if 'errors' in response.text:
-            return 'error'
+        if 'errors' in response.text.lower():  # Case-insensitive check
+            raise RuntimeError(f"Error in response: {response.text}")
+
+        # except json.JSONDecodeError:
+        #     print("Error: Failed to parse JSON file.")
+        # except FileNotFoundError:
+        #     print("Error: JSON file not found.")
+        # except requests.exceptions.RequestException as e:
+        #     print(f"HTTP Request Error: {e}")
+        # except Exception as e:
+        #     print(f"An unexpected error occurred: {e}")
+
 
     def process_service_for_ip(self):
         service_functions = {
@@ -319,18 +349,35 @@ class MegManager:
             'Accept': 'application/json',
         }
 
-        try:
-            response = requests.request("POST", url, headers=headers, json=cred, verify=False)
-            self.TOKEN = response.json()['token']
-            if self.TOKEN:
-                print(f"SUCCESS, got token: {self.TOKEN}")
-        except:
-            print(f"Failed to get token for {self.ip}")
+        # try:
+        # Send the authentication request
+        response = requests.post(url, headers=headers, json=cred, verify=False)
+        
+        # Raise an error for bad HTTP status codes (4xx, 5xx)
+        response.raise_for_status()
 
-        if '"code": 401' in response.text:
-            return 'error'
-        return 'success'
+        # Parse JSON response
+        response_data = response.json()
 
+        # Extract the token
+        self.TOKEN = response_data.get('token')
+
+        if self.TOKEN:
+            print(f"SUCCESS, got token: {self.TOKEN}")
+            return 'success'
+        else:
+            print(f"Error: Token missing in response from {self.ip}")
+            raise RuntimeError(f"Error: Token missing in response from {self.ip}")
+
+        # except requests.exceptions.RequestException as e:
+        #     print(f"HTTP Request Error for {self.ip}: {e}")
+        # except json.JSONDecodeError:
+        #     print(f"Error: Invalid JSON response from {self.ip}")
+        # except KeyError:
+        #     print(f"Error: 'token' key missing in response from {self.ip}")
+        # except Exception as e:
+        #     print(f"Unexpected error: {e}")
+    
 
     def post_decode_service(self):
         print(f"Posting decode service to {self.ip} with payload: {self.file_name}")
@@ -344,16 +391,74 @@ class MegManager:
         print('...HEADERS...')
         print(headers)
 
+        # try:
+        # Load payload from file
         with open(self.payload, "r") as file:
             self.payload = json.load(file)
 
         print(self.payload)
-        response = requests.request("POST", url, headers=headers, json=self.payload, verify=False)
-        print(response.text)
 
-        if 'errors' in response.text:
-            return 'error'
-        return 'success'
+        # Send HTTP POST request
+        response = requests.post(url, headers=headers, json=self.payload, verify=False)
+
+        # Raise an error for bad HTTP status codes (4xx, 5xx)
+        response.raise_for_status()
+
+        print(f"Response [{response.status_code}]: {response.text}")
+
+        # except FileNotFoundError:
+        #     print("Error: JSON file not found.")
+        # except json.JSONDecodeError:
+        #     print("Error: Failed to parse JSON file.")
+        # except requests.exceptions.RequestException as e:
+        #     print(f"HTTP Request Error: {e}")
+        # except Exception as e:
+        #     print(f"Unexpected error: {e}")
+
+
+    def put_set_output_port(self):
+        print(f"POST: Setting port of device")
+
+        # try:
+        # Read JSON file
+        with open(self.payload, "r") as file:
+            data = json.load(file)
+
+        # Extract outputType
+        output_type = data.get("outputs", [{}])[0].get("outputService", {}).get("outputTS", {}).get("outputType", "")
+
+        url = f"https://{self.ip}:8443/api/v2/AppSettings/Node/Configuration/PCI/00000000-0000-0000-0000-000000000002"
+        payload = json.dumps({
+            "ports": [
+                {
+                    "physicalType": output_type if output_type in ["SDI", "ASI"] else "SDI",
+                    "hardwarePortNumber": hardware_port,
+                    "packetFormat": "188"
+                }
+            ]
+        })
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': self.TOKEN
+        }
+
+        # Send request
+        response = requests.put(url, headers=headers, data=payload, verify=False)
+        print(f"Response: {response.status_code}, {response.text}")
+
+        # Check if the status is not 202
+        response.raise_for_status()  # Raises an error for HTTP status codes 4xx/5xx
+
+        # except json.JSONDecodeError:
+        #     print("Error: Failed to parse JSON file.")
+        # except FileNotFoundError:
+        #     print("Error: JSON file not found.")
+        # except requests.exceptions.RequestException as e:
+        #     print(f"HTTP Request Error: {e}")
+        # except Exception as e:
+        #     print(f"An unexpected error occurred: {e}")
+
 
     # TODO
     def post_descramble_service(self):
@@ -361,11 +466,13 @@ class MegManager:
         url = f"https://{self.ip}:8443/api/v2/Descrambling?results=false"
         self.post(url=url)
 
+
     # TODO
     def post_transcode_service(self):
         print(f"Posting transcode service to {self.ip} with payload: {self.file_name}")
         url = f"https://{self.ip}:8443/api/v2/LinearTranscodeServices?results=false"
         self.post(url)
+
 
     def force_arp_update(self):
         print("Forcing arp update on switch")
@@ -377,21 +484,22 @@ class MegManager:
             "fast_cli": False,
         }
 
-        try:
-            print("Connect to the switch")
-            net_connect = ConnectHandler(**device)
-            
-            print("Run ping command")
-            output = net_connect.send_command(f"ping {self.ip}")
-            
-            print(output)  # Print the result
+        # try:
+        print("Connect to the switch")
+        net_connect = ConnectHandler(**device)
+        
+        print("Run ping command")
+        output = net_connect.send_command(f"ping {self.ip}")
+        
+        print(output)  # Print the result
 
-            print("Close connection")
-            net_connect.disconnect()
+        print("Close connection")
+        net_connect.disconnect()
 
-            print("Arp update complete")
-        except Exception as e:
-            print(f"SSH Error: {e}")
+        print("Arp update complete")
+        # except Exception as e:
+        #     print(f"SSH Error: {e}")
+
 
     def is_ip_reachable(self, duration=60):
         """
@@ -410,11 +518,17 @@ class MegManager:
                 clear_arp_cache(switch_ip, switch_username, switch_password, switch_enable_password)
                 self.force_arp_update()
                 subprocess.check_call(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                print("Meg is reachable. Continuing with payload")
                 return True  # Device is reachable
             except subprocess.CalledProcessError:
                 time.sleep(1)  # Wait before retrying
+            except Exception as e:
+                print(f"Error checking IP reachability: {e}")
+                print("TRYING AGAIN")   
+                time.sleep(1)  # Wait before retrying
         
-        return False  # Timeout reached without success
+        # If it reaches here, the MEG is not reachable
+        raise Exception(f"MEG at {self.ip} is not reachable after {duration} seconds.")
     
 # meg = MegManager("/Users/ajones/Documents/Synamedia/git/MAGGIE/Templates/Decode_DEMO.json", None, None)
 # meg.prechecks()

@@ -170,28 +170,7 @@ class ToolTab:
                     print(f"Turning port {int(port) - 1} on")
                     set_port(switch_ip, port, 1)      # Turn port on
 
-                    # Raise an error if MEG is unreachable
-                    if not meg.is_ip_reachable(duration=60):
-                        raise Exception("Meg is not reachable")
-
-                    print("Meg is reachable. Continuing with payload")
-
-                    meg.prechecks()
-
-                    # Get auth for this MEG
-                    print("Getting authorization to meg...")
-                    if meg.post_auth() == 'error':
-                        raise Exception("Authorization failed")
-
-                    # Make post request to MEG
-                    print("Making post request...")
-                    if meg.process_service_for_ip() == 'error':
-                        raise Exception("Service post failed")
-
-                    meg.cleanup()
-
-                    # Turn port off
-                    set_port(switch_ip, port, 2)  
+                    meg.configure()
 
                     # set status to green    
                     self.status_panel.update_circle_color(port, status='success')
@@ -201,9 +180,10 @@ class ToolTab:
                     self.status_panel.update_circle_color(port, status='failed')
 
                 finally:
+                    print()
                     set_port(switch_ip, port, 2)  # Turn port off
 
-            update_all_ports(switch_ip, 1)
+            # update_all_ports(switch_ip, 1)
             print()
             print("==============================================")
             print("PAYLOAD PROCESS COMPLETE")
