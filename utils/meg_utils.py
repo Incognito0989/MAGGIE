@@ -430,7 +430,7 @@ class MegManager:
             output_type = data.get("outputs", [{}])[0].get("outputService", {}).get("outputTS", {}).get("outputType", "")
         except Exception as e:
             physical_type = 'SDI'
-            
+
         # Determine physicalType value
         physical_type = output_type if output_type in ["SDI", "ASI"] else "SDI"
         
@@ -442,6 +442,7 @@ class MegManager:
             "ports": [
                 {
                     "physicalType": physical_type,
+                    "ioType": "Output",
                     "hardwarePortNumber": hardware_port,
                     "packetFormat": "188"
                 }
