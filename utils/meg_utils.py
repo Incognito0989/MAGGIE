@@ -11,6 +11,7 @@ from utils.switch_utils import *
 from netmiko import ConnectHandler
 import os
 import pexpect
+from time import sleep
 
 # ## GLOBAL VARIABLES
 # management_port = 49            #this is physical port 48
@@ -425,8 +426,11 @@ class MegManager:
             data = json.load(file)
 
         # Extract outputType
-        output_type = data.get("outputs", [{}])[0].get("outputService", {}).get("outputTS", {}).get("outputType", "")
-
+        try:
+            output_type = data.get("outputs", [{}])[0].get("outputService", {}).get("outputTS", {}).get("outputType", "")
+        except Exception as e:
+            physical_type = 'SDI'
+            
         # Determine physicalType value
         physical_type = output_type if output_type in ["SDI", "ASI"] else "SDI"
         
