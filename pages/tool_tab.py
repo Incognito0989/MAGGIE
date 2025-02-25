@@ -142,6 +142,8 @@ class ToolTab:
             print()
             print("INITIATING PAYLOAD PROCESS")
 
+            self.status_panel.update_all_circle_color(status='disconnected')
+
             #Get all operational ports to configure
             print("Getting operational ports")
             update_all_ports(switch_ip, 1)
@@ -153,8 +155,6 @@ class ToolTab:
             # turn off all ports except management and exceptions and non active
             print("Turning off all active ports")
             update_ports(ports, 2, self)
-            
-            self.status_panel.update_all_circle_color(status='disconnected')
 
             # send payload for each port
             for port in ports:
