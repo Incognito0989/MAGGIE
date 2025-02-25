@@ -427,11 +427,17 @@ class MegManager:
         # Extract outputType
         output_type = data.get("outputs", [{}])[0].get("outputService", {}).get("outputTS", {}).get("outputType", "")
 
+        # Determine physicalType value
+        physical_type = output_type if output_type in ["SDI", "ASI"] else "SDI"
+        
+        # Print the result of the conditional check
+        print(f"Setting physicalType to: {physical_type}")
+
         url = f"https://{self.ip}:8443/api/v2/AppSettings/Node/Configuration/PCI/00000000-0000-0000-0000-000000000002"
         payload = json.dumps({
             "ports": [
                 {
-                    "physicalType": output_type if output_type in ["SDI", "ASI"] else "SDI",
+                    "physicalType": physical_type,
                     "hardwarePortNumber": hardware_port,
                     "packetFormat": "188"
                 }
