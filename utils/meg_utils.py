@@ -407,6 +407,7 @@ class MegManager:
         payload = json.dumps({
             "ports": [
                 {
+                    "userName": "SDI1" if physical_type == "SDI" else "ASI-P1",
                     "physicalType": physical_type,
                     "ioType": "Output",
                     "hardwarePortNumber": hardware_port,
