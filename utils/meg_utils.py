@@ -396,13 +396,23 @@ class MegManager:
             output_type = data.get("outputs", [{}])[0].get("outputService", {}).get("outputTS", {}).get("outputType", "")
             if not output_type:
                 raise ValueError("[INFO] outputs.outputService.outputTS not found... checking different route")
+            output_interface = data.get("outputs", [{}])[0].get("outputService", {}).get("outputTS", {}).get("interface", "")
+            if not output_interface:
+                output_interface = "ASI-P1"
         except Exception as e:
             output_type = data.get("outputService", {}).get("outputTS", {}).get("outputType", "")
             if not output_type:
                 raise ValueError("[ERROR] no outputType found")
+            output_interface = data.get("outputService", {}).get("outputTS", {}).get("interface", "")
+            if not output_interface:
+                output_interface = "SDI1"
 
         # Determine physicalType value
-        physical_type = output_type if output_type in ["SDI", "ASI"] else "SDI"
+        physical_type = output_type if output_type in ["SDI", "ASI"] else None
+
+        if physical_type == None:
+            print("[INFO] physical output type is not to be changed")
+            return
         
         # Print the result of the conditional check
         print(f"Setting physicalType to: {physical_type}")
@@ -411,7 +421,7 @@ class MegManager:
         payload = json.dumps({
             "ports": [
                 {
-                    "userName": "SDI1" if physical_type == "SDI" else "ASI-P1",
+                    "userName": output_interface,
                     "physicalType": physical_type,
                     "ioType": "Output",
                     "hardwarePortNumber": hardware_port,
