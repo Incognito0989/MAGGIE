@@ -29,17 +29,26 @@ from time import sleep
 # port_exclusions = [management_port]
 # ## port range that is being used is  2 ... 49
 class MegManager:
-    def __init__(self, payload, processing_type, service_dir):
+    def __init__(self, payload, 
+                 processing_type, 
+                 service_dir, 
+                 ip=meg_ip, 
+                 rest_username=meg_rest_username, 
+                 rest_password=meg_rest_password,
+                 username=meg_username,
+                 password=meg_password,
+                 pcie_port='00000000-0000-0000-0000-000000000002'):
         self.TOKEN = None
-        self.ip = meg_ip
+        self.ip = ip
         self.processing_type = processing_type
-        self.rest_username = meg_rest_username
-        self.rest_password = meg_rest_password
-        self.username = meg_username
-        self.password = meg_password
+        self.rest_username = rest_username
+        self.rest_password = rest_password
+        self.username = username
+        self.password = password
         self.service_dir = service_dir
         self.payload = payload
         self.file_name = os.path.basename(self.payload)
+        self.pcie_port = pcie_port
         self.device = {
             "device_type": "linux",
             "host": self.ip,
@@ -51,6 +60,7 @@ class MegManager:
 
 
     def configure(self):
+        print("--- Meg Configuration Beginning ---")
         self.is_ip_reachable(duration=60)
         self.change_expired_password()
         self.reset_password_ssh()
@@ -72,7 +82,6 @@ class MegManager:
         # child.logfile = sys.stdout  # Show output in the terminal
         print("Starting SSH session...")
 
-        # try:
         # Handle SSH key verification prompt
         index = child.expect([
             'Are you sure you want to continue connecting (yes/no/[fingerprint])?',
@@ -119,11 +128,6 @@ class MegManager:
         child.sendline(self.password)
         print(f"Retyped new password: {self.password}")
 
-        # except pexpect.exceptions.TIMEOUT:
-        #     print(f"Timeout occurred. Last received output: {child.before}")  # Show last received text before timeout
-        #     child.close()
-        #     return
-
         # Wait for success message
         child.expect(['successfully', pexpect.TIMEOUT], timeout=30)
         print(f"Final response: {child.after}")  # Print final confirmation or timeout
@@ -137,7 +141,6 @@ class MegManager:
         child = pexpect.spawn(self.ssh_command, encoding='utf-8')
         # child.logfile = sys.stdout  # Print interactions
 
-        # try:
         child.expect('password: ', timeout=15)
         print("Logging in again to reset password.")
         child.sendline(self.password)
@@ -161,15 +164,11 @@ class MegManager:
         child.expect(['password updated successfully', pexpect.TIMEOUT], timeout=15)
         print(f"Password reset response: {child.after}")
 
-        # except pexpect.exceptions.TIMEOUT:
-        #     print(f"Timeout occurred while resetting password. Last output: {child.before}")
-
         child.close()
         print("Password reset completed.")
 
 
     def cleanup(self):
-        # try:
         print("Cleaning up meg to fresh look")
         print(f"Connecting to device: {self.ip}")
         print(self.device)
@@ -186,9 +185,6 @@ class MegManager:
 
             print("Cleanup OS user/history and keys")
             output = ssh.send_command_timing("shred -u /root/.ssh/authorized_keys && chage -d 0 root && history -c")
-
-        # except Exception as e:
-        #     print(f"Error: {e}")
 
 
     def clean(self):
@@ -304,7 +300,6 @@ class MegManager:
             'Authorization': self.TOKEN
         }
 
-        # try:
         with open(self.payload, "r") as file:
             self.payload = json.load(file)
 
@@ -316,21 +311,13 @@ class MegManager:
         if 'errors' in response.text.lower():  # Case-insensitive check
             raise RuntimeError(f"Error in response: {response.text}")
 
-        # except json.JSONDecodeError:
-        #     print("Error: Failed to parse JSON file.")
-        # except FileNotFoundError:
-        #     print("Error: JSON file not found.")
-        # except requests.exceptions.RequestException as e:
-        #     print(f"HTTP Request Error: {e}")
-        # except Exception as e:
-        #     print(f"An unexpected error occurred: {e}")
-
 
     def process_service_for_ip(self):
         service_functions = {
             "Decode": self.post_decode_service,
             "Transcode": self.post_transcode_service,
-            "Descramble": self.post_descramble_service
+            "Descramble": self.post_descramble_service,
+            "ServiceRoute": self.post_service_route
         }
         
         if self.processing_type in service_functions:
@@ -350,7 +337,6 @@ class MegManager:
             'Accept': 'application/json',
         }
 
-        # try:
         # Send the authentication request
         response = requests.post(url, headers=headers, json=cred, verify=False)
         
@@ -369,16 +355,7 @@ class MegManager:
         else:
             print(f"Error: Token missing in response from {self.ip}")
             raise RuntimeError(f"Error: Token missing in response from {self.ip}")
-
-        # except requests.exceptions.RequestException as e:
-        #     print(f"HTTP Request Error for {self.ip}: {e}")
-        # except json.JSONDecodeError:
-        #     print(f"Error: Invalid JSON response from {self.ip}")
-        # except KeyError:
-        #     print(f"Error: 'token' key missing in response from {self.ip}")
-        # except Exception as e:
-        #     print(f"Unexpected error: {e}")
-    
+        
 
     def post_decode_service(self):
         print(f"Posting decode service to {self.ip} with payload: {self.file_name}")
@@ -392,7 +369,6 @@ class MegManager:
         print('...HEADERS...')
         print(headers)
 
-        # try:
         # Load payload from file
         with open(self.payload, "r") as file:
             self.payload = json.load(file)
@@ -407,20 +383,10 @@ class MegManager:
 
         print(f"Response [{response.status_code}]: {response.text}")
 
-        # except FileNotFoundError:
-        #     print("Error: JSON file not found.")
-        # except json.JSONDecodeError:
-        #     print("Error: Failed to parse JSON file.")
-        # except requests.exceptions.RequestException as e:
-        #     print(f"HTTP Request Error: {e}")
-        # except Exception as e:
-        #     print(f"Unexpected error: {e}")
-
 
     def put_set_output_port(self):
         print(f"POST: Setting port of device")
 
-        # try:
         # Read JSON file
         with open(self.payload, "r") as file:
             data = json.load(file)
@@ -429,7 +395,7 @@ class MegManager:
         try:
             output_type = data.get("outputs", [{}])[0].get("outputService", {}).get("outputTS", {}).get("outputType", "")
         except Exception as e:
-            physical_type = 'SDI'
+            output_type = data.get("outputService", {}).get("outputTS", {}).get("outputType", "")
 
         # Determine physicalType value
         physical_type = output_type if output_type in ["SDI", "ASI"] else "SDI"
@@ -437,7 +403,7 @@ class MegManager:
         # Print the result of the conditional check
         print(f"Setting physicalType to: {physical_type}")
 
-        url = f"https://{self.ip}:8443/api/v2/AppSettings/Node/Configuration/PCI/00000000-0000-0000-0000-000000000002"
+        url = f"https://{self.ip}:8443/api/v2/AppSettings/Node/Configuration/PCI/{self.pcie_port}"
         payload = json.dumps({
             "ports": [
                 {
@@ -461,15 +427,6 @@ class MegManager:
         # Check if the status is not 202
         response.raise_for_status()  # Raises an error for HTTP status codes 4xx/5xx
 
-        # except json.JSONDecodeError:
-        #     print("Error: Failed to parse JSON file.")
-        # except FileNotFoundError:
-        #     print("Error: JSON file not found.")
-        # except requests.exceptions.RequestException as e:
-        #     print(f"HTTP Request Error: {e}")
-        # except Exception as e:
-        #     print(f"An unexpected error occurred: {e}")
-
 
     # TODO
     def post_descramble_service(self):
@@ -485,6 +442,13 @@ class MegManager:
         self.post(url)
 
 
+    # TODO
+    def post_service_route(self):
+        print(f"Posting service route of service to {self.ip} with payload: {self.file_name}")
+        url = f"https://{self.ip}:8443/api/v2/OutputServiceRoutings?results=false"
+        self.post(url)
+
+
     def force_arp_update(self):
         print("Forcing arp update on switch")
         device = {
@@ -495,7 +459,6 @@ class MegManager:
             "fast_cli": False,
         }
 
-        # try:
         print("Connect to the switch")
         net_connect = ConnectHandler(**device)
         
@@ -508,8 +471,6 @@ class MegManager:
         net_connect.disconnect()
 
         print("Arp update complete")
-        # except Exception as e:
-        #     print(f"SSH Error: {e}")
 
 
     def is_ip_reachable(self, duration=60):

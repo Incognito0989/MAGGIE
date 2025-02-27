@@ -59,48 +59,45 @@ class ToolTab:
         self.log_viewer = LogViewer(tool_tab)
         self.log_viewer.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
+
     def validate_config_file(self, selected_file):
-        if selected_file is None:
+        if not selected_file:
             print("No file has been selected")
-            return False  # Nothing selected
+            return False  
 
         if not selected_file.endswith('.json'):
             print("Selected file is not of type json")
-            return False  # File is not a JSON file
-        
+            return False  
+
         try:
             with open(selected_file, 'r') as f:
                 data = json.load(f)
-            
-            # Check for 'processing.processingType'
-            processing_section = data.get("processing", {})
-            processing_type = processing_section.get("processingType", "").strip()  # Ensure it's a string
+
+            processing_type = data.get("processing", {}).get("processingType", "").strip()
 
             print(f"[DEBUG] Processing type read from JSON: '{processing_type}'")
 
             if not processing_type:
-                print("Missing 'processingType' field in JSON.")
-                return False
+                print("Missing 'processingType' field in JSON. Checking non-processing service type")
+                self.processing_type = "Descrambling" if data.get("descrambling", {}).get("descramblingType", "").strip() else "ServiceRoute"
+                print(f"[INFO] Matched processing type is: {self.processing_type}")
+                return True  
 
-            # Define valid processing types
+            # Validate processing type
             valid_keywords = {"Decode", "Transcode", "Descramble"}
+            self.processing_type = next((kw for kw in valid_keywords if kw in processing_type), None)
 
-            # Find which valid keyword is in processingType
-            matched_keyword = next((keyword for keyword in valid_keywords if keyword in processing_type), None)
+            if not self.processing_type:
+                print(f"Invalid processingType: '{processing_type}'. Expected one of {valid_keywords}.")
+                return False  
 
-            if not matched_keyword:
-                print(f"Invalid processingType: '{processing_type}'. Expected to contain one of {valid_keywords}.")
-                return False
-
-            # Save the matched keyword
-            self.processing_type = matched_keyword  
             print(f"[INFO] Matched processingType: '{self.processing_type}'")
+            return True  
 
-            return True  # Valid processingType
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print(f"Error loading JSON: {e}")
+            return False  
 
-        except (json.JSONDecodeError, FileNotFoundError) as e:
-            # If there's an error loading the JSON, return False
-            return False
 
     # Run config based on selected IP range or inventory file
     def begin_config(self):
@@ -155,28 +152,29 @@ class ToolTab:
             # turn off all ports except management and exceptions and non active
             print("Turning off all active ports")
             update_ports(ports, 2, self)
-
-            # send payload for each port
+ 
+            print("--- Beginning Port by Port Production ---")
             for port in ports:
                 try:
-                    print(self.payload)
+                    print(f"===================MEG CONFIG ON PORT {(int(port) - 1)}========================")
                     meg = MegManager(payload=self.payload, processing_type=self.processing_type, service_dir=self.service_dir)
                     print(meg.payload)
+                    print(meg.processing_type)
                     self.status_panel.update_circle_color(port, 'processing')
                     print()
 
                     # (port - 1) because the first port is number 2. this is done for readability
-                    print(f"===================MEG CONFIG ON PORT {(int(port) - 1)}========================")
                     print(f"Turning port {int(port) - 1} on")
                     set_port(switch_ip, port, 1)      # Turn port on
 
                     meg.configure()
 
                     # set status to green    
+                    print(f"[SUCCESS] Port {int(port) - 1} configured successfully.")
                     self.status_panel.update_circle_color(port, status='success')
 
                 except Exception as e:
-                    print(f"Error on port {int(port) - 1}: {e}")
+                    print(f"[ERROR] Failed on port {int(port) - 1}: {e}")
                     self.status_panel.update_circle_color(port, status='failed')
 
                 finally:
