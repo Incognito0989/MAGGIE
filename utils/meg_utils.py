@@ -415,7 +415,7 @@ class MegManager:
             return
         
         # Print the result of the conditional check
-        print(f"Setting physicalType to: {physical_type}")
+        print(f"Setting physicalType to: {physical_type} with interface name: {output_interface}")
 
         url = f"https://{self.ip}:8443/api/v2/AppSettings/Node/Configuration/PCI/{self.pcie_port}"
         payload = json.dumps({
