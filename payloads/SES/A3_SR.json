@@ -1,0 +1,174 @@
+{
+    "name": "HSN1 HD MP4 TSoip Out",
+    "inputService": {
+        "source": {
+            "id": null,
+            "inputType": "DVB-S2",
+            "dvbs2Settings": {
+                "interface": "DVBS2 1",
+                "frequency": 4080000,
+                "DVBS_Mode": "DVB_S2",
+                "symbolRate": 30000,
+                "tsStandard": "Default",
+                "channelId": ""
+            }
+        },
+        "inputType": "DVB-S2",
+        "dvbs2Settings": {
+            "serviceId": 20,
+            "serviceSystemName": "",
+            "serviceUserName": "HSN1 HD MP4 to MP2 ASI Out"
+        }
+    },
+    "outputService": {
+      "outputTS": {
+        "outputType": "XGRESS",
+        "interface": "Data1",
+        "targetIp": "225.1.1.1",
+        "targetUdp": 49153,
+        "name": "",
+        "TSID": 1,
+        "ONID": 1,
+        "tags": [],
+        "sourceIPAddress": "Interface",
+        "sourceUdp": 8111,
+        "rateMode": "CBR",
+        "rate": 40000000,
+        "outputProtocol": "RTP",
+        "tableStandard": "DVB",
+        "streaming": "On",
+        "generateSyncUUID": true,
+        "syncUUID": "80000000-0000-c0a8-0100-c10200000001",
+        "TOS": 0,
+        "TTL": 64,
+        "UdpSize": 7,
+        "tsScrambling": {
+          "scramblingAction": "Scrambling",
+          "mode": "DvbScrambling",
+          "algorithm": "CSA",
+          "initializationVector": "00000000000000000000000000000000",
+          "forceScramblingBits": false,
+          "sparVariant": 0,
+          "controlWordSync": "Disabled_for_CW",
+          "clearStrongPairingEnforcement": false,
+          "sessionWordConfigured": false,
+          "parity": null,
+          "operatingMode": "Simulcrypt",
+          "cwGenerationMode": "Conformance",
+          "packetsNotScrambled": "None",
+          "scrambledPercentage": 100,
+          "nullStuffingPackets": "Scrambled",
+          "scramblingDescriptor": "Disabled",
+          "allowEcmRemapping": true
+        },
+        "probeTS": {
+          "targetIp": "",
+          "targetUdp": 0,
+          "sourceIPAddress": null,
+          "streaming": null
+        },
+        "URC_DataPidMeasurements": {
+          "mode": null,
+          "type": [],
+          "host": null,
+          "udpPort": null,
+          "poolName": null,
+          "minBandwidthRequestInterval": null
+        },
+        "alarmSettings": {
+          "payloadBitrateTooLow": {
+            "enable": false,
+            "threshold": 36000000,
+            "triggerForTsOutputLoss": true
+          },
+          "stuffingRateTooLow": {
+            "enable": false,
+            "threshold": 1000000,
+            "triggerForTsOutputLoss": true
+          },
+          "serviceLoss": {
+            "triggerForTsOutputLossForServiceLoss": "AnyOneService"
+          },
+          "serviceNotScrambled": {
+            "triggerForTsOutputLoss": true
+          }
+        },
+        "channelId": "",
+        "componentSharing": "ShareAlways",
+        "autoPassRules": {
+          "tsAutoPass": {
+            "removeAutoPassedOnRuleRemoval": false,
+            "removeServiceIfNotPresentInPAT": false,
+            "tsAutoPassRules": []
+          },
+          "serviceAutoPass": {
+            "passESs": true,
+            "passECMs": true,
+            "passES_ECMs": true
+          }
+        },
+        "vlan": {
+          "vlanId": null
+        },
+        "tsFEC": {
+          "triggerMode": "Disabled",
+          "sendingArrangement": "BlockAligned",
+          "columnFEC": {
+            "targetIp": null,
+            "targetUdp": null
+          },
+          "rowFEC": {
+            "targetIp": null,
+            "targetUdp": null
+          },
+          "D_ColDepth": 6,
+          "L_RowLength": 10
+        },
+        "rip": {
+          "enable": false,
+          "normalMetric": 1,
+          "alarmMetric": 16,
+          "routeTag": 0
+        },
+        "targetIpOverrule": null,
+        "srtSettings": null,
+        "zixiSettings": null,
+        "rtmpSettings": null,
+        "ristSettings": null,
+        "depiSettings": null,
+        "httpSettings": null
+      },
+      "name": "BYP802 HSN1HD ENC-B036-D-03b",
+      "forceName": true,
+      "forceSID": true,
+      "sid": 20,
+      "streaming": "On",
+      "pids": [],
+      "alternatePCR": {
+        "enable": false,
+        "noInput": null,
+        "sourceId": null,
+        "sourceUrl": null,
+        "pcrPid": null
+      },
+      "scrambling": {
+        "mode": "Disabled",
+        "scrambleOnlyAV": false,
+        "blockCaInfo": false,
+        "sessionWordConfigured": true,
+        "powerKeySession": {
+          "sessionID": null,
+          "isEncrypted": null,
+          "ecmDelivered": null,
+          "iskAvailable": null,
+          "pkEcmAvailable": null,
+          "scpEcmAvailable": null
+        }
+      },
+      "serviceBackup": {
+        "serviceBackupMode": "NonRevertive",
+        "delayMainToBackup": 0,
+        "delayBackupToMain": 10
+      }
+    }
+  }
