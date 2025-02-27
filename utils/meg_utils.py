@@ -394,8 +394,12 @@ class MegManager:
         # Extract outputType
         try:
             output_type = data.get("outputs", [{}])[0].get("outputService", {}).get("outputTS", {}).get("outputType", "")
+            if not output_type:
+                raise ValueError("[INFO] outputs.outputService.outputTS not found... checking different route")
         except Exception as e:
             output_type = data.get("outputService", {}).get("outputTS", {}).get("outputType", "")
+            if not output_type:
+                raise ValueError("[ERROR] no outputType found")
 
         # Determine physicalType value
         physical_type = output_type if output_type in ["SDI", "ASI"] else "SDI"
