@@ -387,25 +387,39 @@ class MegManager:
     def put_set_output_port(self):
         print(f"POST: Setting port of device")
 
+        paths = [
+            ("outputs", "outputService", "outputTS"),
+            ("outputService", "outputTS"),
+            ("outputs",)
+        ]
+
         # Read JSON file
         with open(self.payload, "r") as file:
             data = json.load(file)
 
-        # Extract outputType
-        try:
-            output_type = data.get("outputs", [{}])[0].get("outputService", {}).get("outputTS", {}).get("outputType", "")
-            if not output_type:
-                raise ValueError("[INFO] outputs.outputService.outputTS not found... checking different route")
-            output_interface = data.get("outputs", [{}])[0].get("outputService", {}).get("outputTS", {}).get("interface", "")
-            if not output_interface:
-                output_interface = "ASI-P1"
-        except Exception as e:
-            output_type = data.get("outputService", {}).get("outputTS", {}).get("outputType", "")
-            if not output_type:
-                raise ValueError("[ERROR] no outputType found")
-            output_interface = data.get("outputService", {}).get("outputTS", {}).get("interface", "")
-            if not output_interface:
-                output_interface = "SDI1"
+        output_type, output_interface = None, None
+
+        for path in paths:
+            try:
+                print(f"[INFO] Checking {'.'.join(path)}.outputType")
+                temp_data = data
+                for key in path:   
+                    temp_data = temp_data.get(key, {})
+                    if isinstance(temp_data, list):
+                        print(f"{key} : theres a list!")
+                        temp_data = dict(temp_data[0])
+                output_type = temp_data.get("outputType", "")
+
+                if output_type:
+                    print(f"[INFO] Found outputType: {output_type}")
+                    output_interface = temp_data.get("interface", "ASI-P1" if path[0] == "outputs" else "SDI1")
+                    break  # Stop checking once we find a valid outputType
+
+            except Exception as e:
+                print(f"[ERROR] Exception while checking {'.'.join(path)}: {e}")
+
+        if not output_type:
+            raise ValueError("[ERROR] No valid outputType found in any path... json file may have wrong structure")
 
         # Determine physicalType value
         physical_type = output_type if output_type in ["SDI", "ASI"] else None
