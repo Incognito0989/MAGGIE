@@ -390,7 +390,7 @@ class MegManager:
         paths = [
             ("outputs", "outputService", "outputTS"),
             ("outputService", "outputTS"),
-            ("outputs")
+            ("outputs",)
         ]
 
         # Read JSON file
@@ -403,8 +403,11 @@ class MegManager:
             try:
                 print(f"[INFO] Checking {'.'.join(path)}.outputType")
                 temp_data = data
-                for key in path:
+                for key in path:   
                     temp_data = temp_data.get(key, {})
+                    if isinstance(temp_data, list):
+                        print(f"{key} : theres a list!")
+                        temp_data = dict(temp_data[0])
                 output_type = temp_data.get("outputType", "")
 
                 if output_type:
