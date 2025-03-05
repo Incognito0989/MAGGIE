@@ -317,7 +317,8 @@ class MegManager:
             "Decode": self.post_decode_service,
             "Transcode": self.post_transcode_service,
             "Descramble": self.post_descramble_service,
-            "ServiceRoute": self.post_service_route
+            "ServiceRoute": self.post_service_route,
+            "TSRoute": self.post_ts_route
         }
         
         if self.processing_type in service_functions:
@@ -387,36 +388,31 @@ class MegManager:
     def put_set_output_port(self):
         print(f"POST: Setting port of device")
 
-        paths = [
-            ("outputs", "outputService", "outputTS"),
-            ("outputService", "outputTS"),
-            ("outputs",)
-        ]
-
         # Read JSON file
         with open(self.payload, "r") as file:
             data = json.load(file)
 
         output_type, output_interface = None, None
 
-        for path in paths:
-            try:
-                print(f"[INFO] Checking {'.'.join(path)}.outputType")
-                temp_data = data
-                for key in path:   
-                    temp_data = temp_data.get(key, {})
-                    if isinstance(temp_data, list):
-                        print(f"{key} : theres a list!")
-                        temp_data = dict(temp_data[0])
-                output_type = temp_data.get("outputType", "")
+        if self.processing_type in ["Transcode"]:
+            temp_data = data.get("outputs", [{}])[0].get("outputService", {}).get("outputTS", {})
+            output_type = temp_data.get("outputType", "")
+            output_interface = temp_data.get("interface", "")
 
-                if output_type:
-                    print(f"[INFO] Found outputType: {output_type}")
-                    output_interface = temp_data.get("interface", "ASI-P1" if path[0] == "outputs" else "SDI1")
-                    break  # Stop checking once we find a valid outputType
+        elif self.processing_type in ["Decode"]:
+            temp_data = data.get("outputs", [{}])[0]
+            output_type = temp_data.get("outputType", "")
+            output_interface = temp_data.get("interface", "")
 
-            except Exception as e:
-                print(f"[ERROR] Exception while checking {'.'.join(path)}: {e}")
+        elif self.processing_type in ["ServiceRoute"]:
+            temp_data = data.get("outputService", {}).get("outputTS", {})
+            output_type = temp_data.get("outputType", "")
+            output_interface = temp_data.get("interface", "")
+
+        elif self.processing_type in ["TSRoute"]:
+            temp_data = data.get("outputLTTS", {})
+            output_type = temp_data.get("outputType", "")
+            output_interface = temp_data.get("asiSettings", {}).get("interface", "")
 
         if not output_type:
             raise ValueError("[ERROR] No valid outputType found in any path... json file may have wrong structure")
@@ -424,9 +420,13 @@ class MegManager:
         # Determine physicalType value
         physical_type = output_type if output_type in ["SDI", "ASI"] else None
 
-        if physical_type == None:
+        if physical_type is None or output_interface == "":
             print("[INFO] physical output type is not to be changed")
             return
+        
+        if output_interface == None:
+            output_interface = "ASI_P1" if physical_type == "ASI" else "SDI1"
+            print(f"[INFO] Output interface being set to default value {output_interface}")
         
         # Print the result of the conditional check
         print(f"Setting physicalType to: {physical_type} with interface name: {output_interface}")
@@ -475,6 +475,12 @@ class MegManager:
     def post_service_route(self):
         print(f"Posting service route of service to {self.ip} with payload: {self.file_name}")
         url = f"https://{self.ip}:8443/api/v2/OutputServiceRoutings?results=false"
+        self.post(url)
+
+    
+    def post_ts_route(self):
+        print(f"Posting ts route to {self.ip} with payload: {self.file_name}")
+        url = f"https://{self.ip}:8443/api/v2/OutputTSRoutings?results=false"
         self.post(url)
 
 

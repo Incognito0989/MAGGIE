@@ -79,7 +79,14 @@ class ToolTab:
 
             if not processing_type:
                 print("Missing 'processingType' field in JSON. Checking non-processing service type")
-                self.processing_type = "Descrambling" if data.get("descrambling", {}).get("descramblingType", "").strip() else "ServiceRoute"
+                
+                print("Checking if TS routing")
+                if data.get("outputLTTS", {}):
+                    self.processing_type = "TSRoute"
+                    return True
+
+                print("Check descrambling and default to service route")
+                self.processing_type = "Descramble" if data.get("descrambling", {}).get("descramblingType", "").strip() else "ServiceRoute"
                 print(f"[INFO] Matched processing type is: {self.processing_type}")
                 return True  
 
