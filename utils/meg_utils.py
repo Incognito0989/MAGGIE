@@ -293,6 +293,22 @@ class MegManager:
                 raise RuntimeError("Max retries reached. REST user configuration failed.")
 
 
+    def put(self, url, body):
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': self.TOKEN
+        }
+
+        response = requests.post(url, headers=headers, json=body, verify=False)
+        response.raise_for_status()  # Raises an error for 4xx/5xx responses
+
+        print(response.text)
+
+        if 'errors' in response.text.lower():  # Case-insensitive check
+            raise RuntimeError(f"Error in response: {response.text}")
+
+
     def post(self, url):
         headers = {
             'Content-Type': 'application/json',
@@ -482,6 +498,20 @@ class MegManager:
         print(f"Posting ts route to {self.ip} with payload: {self.file_name}")
         url = f"https://{self.ip}:8443/api/v2/OutputTSRoutings?results=false"
         self.post(url)
+
+
+    def factory_reset(self):
+        print(f"[INFO] Factory resetting {self.ip}")
+        url = f"https://{self.ip}:8443/api/v2/Restart?results=false"
+        body = {
+            "restartAction": "ClearSettings"
+        }
+        self.put(url, body)
+
+        try:
+            self.cleanup()
+        except Exception as e:
+            print("[ERROR] Failed to clean password... credentials may be wrong")
 
 
     def force_arp_update(self):

@@ -28,6 +28,10 @@ class ToolTab:
         tool_tab = ttk.Frame(self.notebook)
         self.notebook.add(tool_tab, text="Tool")
 
+        # Frame to contain buttons
+        button_frame = tk.Frame(tool_tab)
+        button_frame.pack(side=tk.BOTTOM, pady=10)
+
         # Mode selection (Config or Generator)
         self.mode_notebook = ttk.Notebook(tool_tab)
         self.mode_notebook.pack(fill=tk.BOTH, expand=False, padx=10, pady=10)
@@ -47,9 +51,13 @@ class ToolTab:
         self.selector.pack(padx=20, pady=20)
         self.service_dir = self.selector.selected_file_path
         
-        # Button to start the configuration process
-        self.begin_button = tk.Button(tool_tab, text="Begin Config", command=self.begin_config, bg="green", fg="black")
-        self.begin_button.pack(side=tk.BOTTOM, expand=True, pady=10, padx=10, anchor="e")
+        # Begin Config Button
+        self.begin_button = tk.Button(button_frame, text="Begin Config", command=self.begin_config, bg="green", fg="black")
+        self.begin_button.grid(row=0, column=1, padx=55)
+
+        # Reset Device Button
+        self.reset_button = tk.Button(button_frame, text="Reset Device", command=self.reset_device, bg="#b8860b", fg="black")
+        self.reset_button.grid(row=0, column=0, padx=55)
 
         # Create and pack the Status Panel on the right side
         self.status_panel = StatusPanel(tool_tab, ports=48, width=tool_tab.winfo_screenwidth(), height=100)
@@ -104,6 +112,35 @@ class ToolTab:
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Error loading JSON: {e}")
             return False  
+
+
+    def reset_device(self):
+        print()
+        print("[INFO] Beginning reset procedure")
+        ports = self.connected_ports()
+
+        for port in ports:
+            try:
+                print(f"===================MEG FACTORY RESET ON PORT {(int(port) - 1)}========================")
+                meg = MegManager(payload=None, processing_type=None, service_dir=None)
+
+                self.status_panel.update_circle_color(port, 'processing')
+                print()
+
+                meg.factory_reset()
+
+                # set status to green    
+                print(f"[SUCCESS] Port {int(port) - 1} factory reset successfully.")
+                self.status_panel.update_circle_color(port, status='success')
+
+            except Exception as e:
+                print(f"[ERROR] Failed on port {int(port) - 1}: {e}")
+                self.status_panel.update_circle_color(port, status='failed')
+
+            finally:
+                print()
+                set_port(switch_ip, port, 2)  # Turn port off
+        update_all_ports(switch_ip, 1)
 
 
     # Run config based on selected IP range or inventory file
