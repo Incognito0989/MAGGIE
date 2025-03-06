@@ -142,53 +142,61 @@ class ToolTab:
         self.config_thread = threading.Thread(target=background, daemon=True)
         self.config_thread.start()     
 
+
+    def connected_ports(self):
+        print()
+        print("[INFO] Getting active ports")
+        self.status_panel.update_all_circle_color(status='disconnected')
+
+        #Get all operational ports to configure
+        print("Getting operational ports")
+        update_all_ports(switch_ip, 1)
+        sleep(10)
+        ports = get_active_ports(switch_ip)
+        print("ACTIVE PORTS: ")
+        print(ports)
+
+        # turn off all ports except management and exceptions and non active
+        print("Turning off all active ports")
+        update_ports(ports, 2, self)
+
+        return ports
+
     def send_payload_all(self):
-            print()
-            print("INITIATING PAYLOAD PROCESS")
+        print()
+        print("INITIATING PAYLOAD PROCESS")
 
-            self.status_panel.update_all_circle_color(status='disconnected')
-
-            #Get all operational ports to configure
-            print("Getting operational ports")
-            update_all_ports(switch_ip, 1)
-            sleep(10)
-            ports = get_active_ports(switch_ip)
-            print("ACTIVE PORTS: ")
-            print(ports)
-
-            # turn off all ports except management and exceptions and non active
-            print("Turning off all active ports")
-            update_ports(ports, 2, self)
+        ports = self.connected_ports()
  
-            print("--- Beginning Port by Port Production ---")
-            for port in ports:
-                try:
-                    print(f"===================MEG CONFIG ON PORT {(int(port) - 1)}========================")
-                    meg = MegManager(payload=self.payload, processing_type=self.processing_type, service_dir=self.service_dir)
-                    print(meg.payload)
-                    print(meg.processing_type)
-                    self.status_panel.update_circle_color(port, 'processing')
-                    print()
+        print("--- Beginning Port by Port Production ---")
+        for port in ports:
+            try:
+                print(f"===================MEG CONFIG ON PORT {(int(port) - 1)}========================")
+                meg = MegManager(payload=self.payload, processing_type=self.processing_type, service_dir=self.service_dir)
+                print(meg.payload)
+                print(meg.processing_type)
+                self.status_panel.update_circle_color(port, 'processing')
+                print()
 
-                    # (port - 1) because the first port is number 2. this is done for readability
-                    print(f"Turning port {int(port) - 1} on")
-                    set_port(switch_ip, port, 1)      # Turn port on
+                # # (port - 1) because the first port is number 2. this is done for readability
+                # print(f"Turning port {int(port) - 1} on")
+                # set_port(switch_ip, port, 1)      # Turn port on
 
-                    meg.configure()
+                meg.configure()
 
-                    # set status to green    
-                    print(f"[SUCCESS] Port {int(port) - 1} configured successfully.")
-                    self.status_panel.update_circle_color(port, status='success')
+                # set status to green    
+                print(f"[SUCCESS] Port {int(port) - 1} configured successfully.")
+                self.status_panel.update_circle_color(port, status='success')
 
-                except Exception as e:
-                    print(f"[ERROR] Failed on port {int(port) - 1}: {e}")
-                    self.status_panel.update_circle_color(port, status='failed')
+            except Exception as e:
+                print(f"[ERROR] Failed on port {int(port) - 1}: {e}")
+                self.status_panel.update_circle_color(port, status='failed')
 
-                finally:
-                    print()
-                    set_port(switch_ip, port, 2)  # Turn port off
+            finally:
+                print()
+                set_port(switch_ip, port, 2)  # Turn port off
 
-            # update_all_ports(switch_ip, 1)
-            print()
-            print("==============================================")
-            print("PAYLOAD PROCESS COMPLETE")
+        update_all_ports(switch_ip, 1)
+        print()
+        print("==============================================")
+        print("PAYLOAD PROCESS COMPLETE")
