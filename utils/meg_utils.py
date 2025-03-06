@@ -506,6 +506,7 @@ class MegManager:
         body = {
             "restartAction": "ClearSettings"
         }
+        
         self.put(url, body)
 
         try:
