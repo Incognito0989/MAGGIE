@@ -506,6 +506,13 @@ class MegManager:
         body = {
             "restartAction": "ClearSettings"
         }
+        
+        self.put(url, body)
+
+        try:
+            self.cleanup()
+        except Exception as e:
+            print("[ERROR] Failed to clean password... credentials may be wrong")
 
 
     def force_arp_update(self):
