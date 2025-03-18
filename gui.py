@@ -5,6 +5,7 @@ from pathlib import Path
 from pages.tool_tab import ToolTab
 from pages.config_editor_tab import create_config_editor_tab
 from pages.inventory_tab import create_inventory_tab
+from pages.license_tab import LicenseTab
 from utils.logo import ResizableImageApp
 from settings import *
 
@@ -52,6 +53,7 @@ notebook.pack(fill="both", expand=True)
 toolTab = ToolTab(notebook, services_dir)
 
 create_config_editor_tab(notebook, services_dir)
+license_tab = LicenseTab(notebook)
 # create_inventory_tab(notebook)
 
 # Run the Tkinter event loop

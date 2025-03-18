@@ -1,4 +1,4 @@
-from netmiko import ConnectHandler
+from netmiko import ConnectHandler, file_transfer
 from settings import *
 import re
 import requests
@@ -300,13 +300,30 @@ class MegManager:
             'Authorization': self.TOKEN
         }
 
-        response = requests.post(url, headers=headers, json=body, verify=False)
+        response = requests.put(url, headers=headers, json=body, verify=False)
         response.raise_for_status()  # Raises an error for 4xx/5xx responses
 
         print(response.text)
 
         if 'errors' in response.text.lower():  # Case-insensitive check
             raise RuntimeError(f"Error in response: {response.text}")
+        
+    
+    def get(self, url):
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': self.TOKEN
+        }
+
+        response = requests.get(url, headers=headers, verify=False)
+        response.raise_for_status()  # Raises an error for 4xx/5xx responses
+
+        print(response.text)
+
+        if 'errors' in response.text.lower():  # Case-insensitive check
+            raise RuntimeError(f"Error in response: {response.text}")
+        return response
 
 
     def post(self, url):
@@ -567,6 +584,99 @@ class MegManager:
         
         # If it reaches here, the MEG is not reachable
         raise Exception(f"MEG at {self.ip} is not reachable after {duration} seconds.")
+    
+
+    def get_license_status(self):
+        url = f"https://{self.ip}:8443/api/v1/license/status"
+        return self.get(url)
+
+
+    def get_host_id(self):
+        response = self.get_license_status()
+        return response["hostData"]["hostId"]
+
+
+    def find_license_file(license_dir, host_id):
+        """
+        Searches for a license file that corresponds to the given host_id.
+
+        :param license_dir: Directory containing license files
+        :param host_id: The host ID to match with a file
+        :return: Full path of the matching license file or None if not found
+        """
+
+        for filename in os.listdir(license_dir):
+            if host_id in filename:  # Assuming filenames contain the host ID
+                return os.path.join(license_dir, filename)
+        raise Exception("No License File Found")  # No matching file found
+
+
+    def scp_file_netmiko(self, local_path, remote_path):
+        with ConnectHandler(**self.device) as ssh_conn:
+            transfer_result = file_transfer(
+                ssh_conn,
+                source_file=local_path,
+                dest_file=remote_path,
+                file_system="/root/",  # Adjust if needed
+                direction="put",
+            )
+
+        return transfer_result
+
+
+    def confirm_license(self, license_file, timeout=30, retry_interval=1):
+        """Keeps retrying the validation of the JSON data until success or timeout."""
+        required_functions = self.extract_required_functions(license_file)  # Only get this once
+        start_time = time.time()
+
+        while time.time() - start_time < timeout:
+            json_data = self.get_license_status()  # Assuming this method is defined elsewhere
+            
+            if self.validate_functions(json_data=json_data, required_functions=required_functions):
+                return True
+
+            time.sleep(retry_interval)  # Wait before retrying
+
+        raise Exception(f"License did not update in alloted time: {timeout}")  # Timeout reached, license check failed
+
+
+    def extract_required_functions(license_file):
+        """Extracts function names from the license file."""
+        required_functions = []
+        with open(license_file, 'r') as file:
+            for line in file:
+                match = re.search(r'FEATURE\s+(\S+)', line)
+                if match:
+                    required_functions.append(match.group(1))
+        return required_functions
+
+
+    def validate_functions(json_data, required_functions):
+        """Validates that required functions exist in the JSON response with a count of at least 1."""
+        if "functions" not in json_data:
+            return False
+
+        function_dict = {func["entitlementTag"]: func["functionCount"] for func in json_data["functions"]}
+
+        for func_name in required_functions:
+            if function_dict.get(func_name, 0) < 1:
+                return False
+
+        return True
+
+
+    def upload_license(self, pwExpire, license_dir):
+        if pwExpire:
+            self.change_expired_password()
+        self.reset_password_ssh()
+        self.post_auth()
+        host_id = self.get_host_id()
+        license_file = self.find_license_file(host_id=host_id, license_dir=license_dir)
+        self.scp_file_netmiko(local_path=license_file, remote_path="/var/meg/synalic")
+        self.confirm_license(license_file=license_file)
+        self.cleanup()
+
+
     
 # meg = MegManager("/Users/ajones/Documents/Synamedia/git/MAGGIE/Templates/Decode_DEMO.json", None, None)
 # meg.prechecks()
