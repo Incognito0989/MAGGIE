@@ -23,19 +23,23 @@ class LicenseTab:
     def __init__(self, notebook):
         """Initialize the LicenseTab and create the components."""
         self.notebook = notebook
-        self.license_tab = ttk.Frame(self.notebook)
-        notebook.add(self.license_tab, text="License")
+        license_tab = ttk.Frame(self.notebook)
+        notebook.add(license_tab, text="License")
 
         # Create and pack the ServiceConfigSelector component
-        self.selector = DirectorySelector(self.license_tab)
+        self.selector = DirectorySelector(license_tab)
         self.selector.pack(fill="both", expand=True, padx=10, pady=10)  # Make sure to pack it
 
         # Frame to contain buttons
-        button_frame = tk.Frame(self.license_tab)
+        button_frame = tk.Frame(license_tab)
         button_frame.pack(side=tk.BOTTOM, pady=10)
 
+        # Create and pack the Status Panel on the right side
+        self.status_panel = StatusPanel(license_tab, ports=48, width=license_tab.winfo_screenwidth(), height=100)
+        self.status_panel.pack(pady=20)
+
         # Log Viewer Panel
-        self.log_viewer = LogViewer(self.license_tab)
+        self.log_viewer = LogViewer(license_tab)
         self.log_viewer.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         # Begin Config Button
